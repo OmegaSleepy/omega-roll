@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Search Anime - CrunchyNeon</title>
+    <title>Search Anime - Omega-Roll</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header>
-    <a href="index.html" class="logo">CrunchyNeon</a>
+    <a href="index.html" class="logo">Omega-Roll</a>
     <nav>
         <a href="index.html">Home</a>
         <a href="explore.html">Explore</a>
@@ -17,9 +17,53 @@
 
 <main class="container">
     <h2>Find Your <span class="neon-title">Next Obsession</span></h2>
-    <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Type anime title here...">
-        <button id="search-btn" class="btn">Search</button>
+    <div class="search-panel section-panel">
+        <div class="filter-row">
+            <input type="text" id="search-input" class="search-input" placeholder="Type anime title here...">
+            <button id="search-btn" class="btn">Search</button>
+        </div>
+        <div class="filter-row">
+            <select id="search-type" class="filter-control">
+                <option value="">Any Type</option>
+                <option value="tv">TV</option>
+                <option value="movie">Movie</option>
+                <option value="ova">OVA</option>
+                <option value="special">Special</option>
+                <option value="ona">ONA</option>
+                <option value="music">Music</option>
+            </select>
+            <select id="search-status" class="filter-control">
+                <option value="">Any Status</option>
+                <option value="airing">Airing</option>
+                <option value="complete">Complete</option>
+                <option value="upcoming">Upcoming</option>
+            </select>
+            <select id="search-rating" class="filter-control">
+                <option value="">Any Rating</option>
+                <option value="G">G</option>
+                <option value="PG">PG</option>
+                <option value="PG-13">PG-13</option>
+                <option value="R">R</option>
+                <option value="R+">R+</option>
+                <option value="Rx">Rx</option>
+            </select>
+            <select id="search-genre" class="filter-control">
+                <option value="">Any Genre</option>
+            </select>
+        </div>
+        <div class="filter-row">
+            <select id="search-order" class="filter-control">
+                <option value="score">Order by Score</option>
+                <option value="title">Order by Title</option>
+                <option value="members">Order by Members</option>
+                <option value="start_date">Order by Start Date</option>
+            </select>
+            <select id="search-sort" class="filter-control">
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+            </select>
+            <input type="number" min="0" max="10" id="search-min-score" class="filter-control" placeholder="Min Score" step="0.1">
+        </div>
     </div>
 
     <div class="anime-grid" id="search-results"></div>

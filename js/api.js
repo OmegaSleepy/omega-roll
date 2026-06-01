@@ -13,7 +13,7 @@ function injectConsistentHeader() {
  const currentPath = window.location.pathname.split("/").pop() || "index.html";
 
  existingHeader.innerHTML = `
-        <a href="index.html" class="logo">CrunchyNeon</a>
+        <a href="index.html" class="logo">Omega-Roll</a>
         <nav style="display: flex; align-items: center; gap: 20px;">
             <a href="index.html" class="${currentPath === 'index.html' ? 'active' : ''}">Home</a>
             <a href="explore.html" class="${currentPath === 'explore.html' ? 'active' : ''}">Browse</a>
@@ -95,6 +95,17 @@ function parseSeasonFromTitle(title) {
  };
 }
 
+function isValidAnime(anime) {
+ const eps = anime.episodes;
+ if (eps === null || eps === undefined) return false;
+ if (typeof eps === 'string') {
+  if (eps.trim().toLowerCase() === 'n/a') return false;
+  const parsed = parseInt(eps, 10);
+  return !isNaN(parsed) && parsed > 0;
+ }
+ return Number(eps) > 0;
+}
+
 // Shared Component UI Card factory processing global title toggle strings
 function createAnimeCard(anime) {
  const card = document.createElement('div');
@@ -109,7 +120,7 @@ function createAnimeCard(anime) {
 
  const { cleanTitle, seasonText } = parseSeasonFromTitle(chosenRawTitle);
  const seasonBadge = seasonText ? ` | <span style="color:#fff; background:#111; padding:2px 6px; border-radius:4px; font-size:11px; border:1px solid var(--neon-green)">${seasonText}</span>` : '';
-
+ const episodeLabel = isValidAnime(anime) ? ` • ${anime.episodes} eps` : '';
  const watchLaterList = JSON.parse(localStorage.getItem('watchLater')) || [];
  const isSaved = watchLaterList.some(item => item.id == anime.mal_id);
 
@@ -122,7 +133,7 @@ function createAnimeCard(anime) {
         </div>
         <div class="info" onclick="window.location.href='anime.html?id=${anime.mal_id}'">
             <h3>${cleanTitle}</h3>
-            <span>★ ${anime.score || 'N/A'} • ${anime.episodes || 'N/A'} eps${seasonBadge}</span>
+            <span>★ ${anime.score || 'N/A'}${episodeLabel}${seasonBadge}</span>
         </div>
     `;
 

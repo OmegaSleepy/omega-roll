@@ -5,9 +5,12 @@ document.addEventListener("DOMContentLoaded", async () => {
  const data = await fetchFromJikan('/seasons/now?limit=12');
 
  if (data && data.data) {
+  const seenIds = new Set();
   data.data.forEach(anime => {
+   if (!isValidAnime(anime) || seenIds.has(anime.mal_id)) return;
+   seenIds.add(anime.mal_id);
    const card = createAnimeCard(anime);
-   trendingGrid.appendChild(card);
+   if (card) trendingGrid.appendChild(card);
   });
  } else {
   trendingGrid.innerHTML = '<p>Failed to load trending content. Please refresh.</p>';
@@ -24,7 +27,7 @@ document.getElementById('export-data-btn').onclick = () => {
  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload));
  const downloadAnchor = document.createElement('a');
  downloadAnchor.setAttribute("href", dataStr);
- downloadAnchor.setAttribute("download", "crunchyneon_profile.json");
+ downloadAnchor.setAttribute("download", "omegaroll_profile.json");
  document.body.appendChild(downloadAnchor);
  downloadAnchor.click();
  downloadAnchor.remove();

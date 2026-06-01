@@ -15,9 +15,113 @@
 }
 
 body {
-    background-color: var(--bg-color);
+    min-height: 100vh;
+    background: radial-gradient(circle at top, rgba(57,255,20,0.08), transparent 20%), var(--bg-color);
     color: var(--text-color);
     padding-bottom: 60px;
+}
+
+.hero-banner {
+    background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.95)), url('https://placehold.co/1200x400/111/39ff14?text=Omega-Roll') no-repeat center/cover;
+    min-height: 360px;
+    display: flex;
+    align-items: flex-end;
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid rgba(57,255,20,0.24);
+    margin-bottom: 40px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.36);
+}
+
+.hero-banner h1 {
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    line-height: 1.05;
+    margin-bottom: 12px;
+    max-width: 720px;
+}
+
+.hero-banner p {
+    color: var(--neon-green);
+    font-size: 1.05rem;
+    max-width: 680px;
+}
+
+.section-panel {
+    background: rgba(14,17,22,0.96);
+    padding: 24px;
+    border-radius: 18px;
+    border: 1px solid rgba(57,255,20,0.15);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    margin-bottom: 30px;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.filter-control,
+.search-input {
+    background: #0f141b;
+    border: 1px solid #222;
+    color: #fff;
+    border-radius: 14px;
+    padding: 12px 14px;
+    min-width: 150px;
+    transition: 0.2s;
+}
+
+.filter-control:focus,
+.search-input:focus {
+    outline: none;
+    border-color: var(--neon-green);
+    box-shadow: 0 0 12px rgba(57,255,20,0.16);
+}
+
+.anime-card .info {
+    min-height: 90px;
+}
+
+.anime-card h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 50px 0;
+}
+
+p {
+    line-height: 1.7;
+    color: var(--text-muted);
+}
+
+.search-panel {
+    margin-bottom: 30px;
+}
+
+.nav a {
+    min-height: 24px;
+}
+
+@media (max-width: 800px) {
+    .filter-row {
+        justify-content: stretch;
+    }
+    .filter-control,
+    .search-input {
+        min-width: 100%;
+    }
 }
 
 /* Navbar */

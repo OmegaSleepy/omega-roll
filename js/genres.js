@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  let currentGenrePage = 1;
  const GENRE_LIMIT = 18;
  let genreLoading = false;
+ const seenGenreIds = new Set();
 
  async function loadAnimeByGenre(genreId, genreName, clickedPill) {
   document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // reset paging state
   currentGenreId = genreId;
   currentGenrePage = 1;
+  seenGenreIds.clear();
   resultGrid.innerHTML = '';
 
   await loadGenrePage(currentGenreId, currentGenrePage);
@@ -47,7 +49,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const response = await fetchFromJikan(`/anime?genres=${genreId}&order_by=score&sort=desc&limit=${GENRE_LIMIT}&page=${page}`);
   genreLoading = false;
   if (response && response.data && response.data.length > 0) {
-   response.data.forEach(anime => resultGrid.appendChild(createAnimeCard(anime)));
+   response.data.forEach(anime => {
+    if (!isValidAnime(anime) || seenGenreIds.has(anime.mal_id)) return;
+    seenGenreIds.add(anime.mal_id);
+    resultGrid.appendChild(createAnimeCard(anime));
+   });
    return true;
   }
   return false;

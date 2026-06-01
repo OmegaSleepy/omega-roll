@@ -5,12 +5,15 @@ document.addEventListener("DOMContentLoaded", async () => {
  let currentPage = 1;
  const LIMIT = 24;
  let loading = false;
+ const seenIds = new Set();
 
  async function loadPage(page) {
   loading = true;
   const data = await fetchFromJikan(`/top/anime?limit=${LIMIT}&page=${page}`);
   if (data && data.data && data.data.length > 0) {
    data.data.forEach(anime => {
+    if (!isValidAnime(anime) || seenIds.has(anime.mal_id)) return;
+    seenIds.add(anime.mal_id);
     exploreGrid.appendChild(createAnimeCard(anime));
    });
    loading = false;

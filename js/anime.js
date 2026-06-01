@@ -19,8 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (lang === 'JP' && anime.title_japanese) chosenTitle = anime.title_japanese;
     else if (lang === 'EN' && anime.title_english) chosenTitle = anime.title_english;
     const { cleanTitle } = parseSeasonFromTitle(chosenTitle);
-    document.title = `${cleanTitle} - CrunchyNeon`;
-
+  document.title = `${cleanTitle} - Omega-Roll`;
     // Improved details UI
     const genres = (anime.genres || []).map(g => `<span class="genre-badge" style="margin-right:6px; padding:4px 8px; background:#0d0d0d; border:1px solid #222; border-radius:12px; font-size:12px;">${g.name}</span>`).join(' ');
 
