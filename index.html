@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CrunchyNeon - Stream Anime</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+
+    <a href="index.html" class="logo">CrunchyNeon</a>
+    <nav>
+        <a href="index.html" class="active">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="search.html">Search</a>
+    </nav>
+</header>
+
+<main class="container">
+    <section style="background: linear-gradient(rgba(0,0,0,0.5), #0b0c10), url('https://placehold.co/1200x400/111/39ff14?text=Welcome+To+CrunchyNeon') no-repeat center; height: 350px; display:flex; align-items:flex-end; padding: 30px; border-radius: 8px; border: 1px solid var(--neon-green); margin-bottom: 40px;">
+        <div>
+            <h1 style="font-size: 3rem; text-shadow: 0 0 10px rgba(0,0,0,0.8)">Unlimited Anime Actions</h1>
+            <p style="color: var(--neon-green)">Explore, Search, and watch without subscription restrictions.</p>
+        </div>
+    </section>
+
+    <h2>Trending <span class="neon-title">This Season</span></h2>
+    <div class="anime-grid" id="trending-grid"></div>
+
+    <hr style="border: 1px solid #222; margin: 60px 0 30px 0;">
+    <section style="background: #111; padding: 25px; border-radius: 8px; border: 1px dashed var(--neon-green)">
+        <h3 style="color: var(--neon-green); margin-bottom: 10px;">💾 Backup Profile Storage System (Data Portability)</h3>
+        <p style="font-size:14px; margin-bottom:20px; color:var(--grey)">Export your Watch Later list and pinned items into a serverless standalone data file, or import them onto another device.</p>
+
+        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+            <button id="export-data-btn" class="btn">📤 Export Local Storage</button>
+
+            <label class="btn" style="background:#1f2833; color:#fff; border:1px solid var(--neon-green); display:inline-block; cursor:pointer;">
+                📥 Import Profile File
+                <input type="file" id="import-data-file" style="display:none;" accept=".json">
+            </label>
+        </div>
+    </section>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

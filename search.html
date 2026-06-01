@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Anime - CrunchyNeon</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+    <a href="index.html" class="logo">CrunchyNeon</a>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="search.html" class="active">Search</a>
+    </nav>
+</header>
+
+<main class="container">
+    <h2>Find Your <span class="neon-title">Next Obsession</span></h2>
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Type anime title here...">
+        <button id="search-btn" class="btn">Search</button>
+    </div>
+
+    <div class="anime-grid" id="search-results"></div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/search.js"></script>
+</body>
+</html>

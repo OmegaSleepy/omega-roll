@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Genres & Themes - CrunchyNeon</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .genre-pill-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+        .genre-pill { background: #111; border: 1px solid var(--grey); padding: 8px 16px; border-radius: 20px; color: #fff; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .genre-pill:hover, .genre-pill.active { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 8px rgba(57,255,20,0.3); background: #000; }
+    </style>
+</head>
+<body>
+<header>
+    <a href="index.html" class="logo">CrunchyNeon</a>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="explore.html">Explore</a>
+        <a href="genres.html" class="active">Genres</a>
+        <a href="search.html">Search</a>
+    </nav>
+</header>
+
+<main class="container">
+    <h2>Select a <span class="neon-title">Genre or Theme</span></h2>
+    <div class="genre-pill-container" id="genres-container">Loading Categories...</div>
+
+    <h3 id="genre-result-title">Select a category above</h3>
+    <div class="anime-grid" id="genre-anime-grid"></div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/genres.js"></script>
+</body>
+</html>

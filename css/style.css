@@ -1,0 +1,186 @@
+:root {
+    --bg-color: #0b0c10;
+    --card-bg: #1f2833;
+    --neon-green: #39ff14;
+    --text-color: #ffffff;
+    --text-muted: #c5a059; /* Cyberpunk gold accent or muted grey */
+    --grey: #a9a9a9;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding-bottom: 60px;
+}
+
+/* Navbar */
+header {
+    background-color: #000000;
+    border-bottom: 2px solid var(--neon-green);
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+}
+
+.logo {
+    color: var(--neon-green);
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--neon-green);
+    text-decoration: none;
+}
+
+nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+nav a:hover, nav a.active {
+    color: var(--neon-green);
+    text-shadow: 0 0 5px var(--neon-green);
+}
+
+/* Global Content Wrapper */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+h1, h2, h3 {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.neon-title {
+    color: var(--neon-green);
+    text-shadow: 0 0 5px var(--neon-green);
+}
+
+/* Grid for Anime Cards */
+.anime-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* Anime Card Component */
+.anime-card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.anime-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--neon-green);
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+}
+
+.anime-card img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+}
+
+.anime-card .info {
+    padding: 12px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.anime-card h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.anime-card span {
+    font-size: 12px;
+    color: var(--neon-green);
+}
+
+/* Search Bar Component */
+.search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: 2px solid var(--grey);
+    background-color: #111;
+    color: #fff;
+    font-size: 16px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--neon-green);
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+}
+
+.btn {
+    padding: 12px 25px;
+    background-color: var(--neon-green);
+    color: #000;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #fff;
+    box-shadow: 0 0 15px #fff;
+}
+
+.watchlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+.watchlist-btn:hover {
+    background: var(--neon-green);
+    color: #000;
+}
+.watchlist-btn.saved {
+    background: var(--neon-green);
+    color: #000;
+}

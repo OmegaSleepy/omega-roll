@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Dashboard - CrunchyNeon</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-section { margin-bottom: 50px; }
+        .pin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .pin-card { background: var(--card-bg); border-left: 4px solid var(--neon-green); padding: 20px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; }
+        .pin-card h4 { font-size: 16px; margin-bottom: 5px; color: #fff; }
+        .pin-card p { font-size: 13px; color: var(--grey); margin-bottom: 15px; }
+        .remove-btn { background: none; border: 1px solid #ff3333; color: #ff3333; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; align-self: flex-start; transition: 0.2s;}
+        .remove-btn:hover { background: #ff3333; color: #fff; }
+    </style>
+</head>
+<body>
+<header></header>
+
+<main class="container">
+    <section class="dashboard-section">
+        <h2>Pinned <span class="neon-title">Episode Progress</span></h2>
+        <div class="pin-grid" id="pinned-episodes-grid"></div>
+    </section>
+
+    <section class="dashboard-section">
+        <h2>My Saved <span class="neon-title">Anime Series</span></h2>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+            <input id="wl-search" placeholder="Search saved..." style="flex:1; padding:8px; border-radius:6px; border:1px solid #222; background: #0b0b0b; color:#fff;" />
+            <select id="wl-sort" style="padding:8px; border-radius:6px; border:1px solid #222; background:#0b0b0b; color:#fff;">
+                <option value="added_desc">Added (new → old)</option>
+                <option value="rating_desc">Rating (high → low)</option>
+                <option value="rating_asc">Rating (low → high)</option>
+                <option value="release_desc">Release (new → old)</option>
+                <option value="episodes_desc">Episodes (many → few)</option>
+            </select>
+        </div>
+        <div class="anime-grid" id="saved-anime-grid"></div>
+    </section>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/watch-later.js"></script>
+</body>
+</html>
