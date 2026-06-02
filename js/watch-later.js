@@ -93,7 +93,7 @@ function renderPinnedEpisodes() {
   card.innerHTML = `
             <div>
                 <h4 style="cursor:pointer;" onclick="window.location.href='watch.html?animeId=${pin.animeId}&ep=${pin.episode}'">${pin.title}</h4>
-                <p>Episode ${pin.episode} • Stopped at ${mins}:${secs}</p>
+                <p>Episode ${pin.episode}</p>
             </div>
             <div style="display:flex; justify-content: space-between; align-items:center; width:100%;">
                 <button class="btn" style="padding: 6px 14px; font-size:12px;" onclick="window.location.href='watch.html?animeId=${pin.animeId}&ep=${pin.episode}'">▶ Resume</button>

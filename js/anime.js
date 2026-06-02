@@ -20,17 +20,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     else if (lang === 'EN' && anime.title_english) chosenTitle = anime.title_english;
     const { cleanTitle } = parseSeasonFromTitle(chosenTitle);
   document.title = `${cleanTitle} - Omega-Roll`;
-    // Improved details UI
-    const genres = (anime.genres || []).map(g => `<span class="genre-badge" style="margin-right:6px; padding:4px 8px; background:#0d0d0d; border:1px solid #222; border-radius:12px; font-size:12px;">${g.name}</span>`).join(' ');
+       const cleanedSynopsis = (anime.synopsis || 'No synopsis available.').replace(/\s*\[Written by MAL Rewrite\]\s*$/i, '');
+       // Improved details UI
+       const genres = (anime.genres || []).map(g => `<span class="genre-badge" style="margin-right:6px; padding:4px 8px; background:#0d0d0d; border:1px solid #222; border-radius:12px; font-size:12px;">${g.name}</span>`).join(' ');
 
-    detailsContainer.innerHTML = `
+       detailsContainer.innerHTML = `
                         <img class="details-poster" src="${anime.images.jpg.large_image_url}" alt="${anime.title}">
                         <div class="details-info">
                                 <h1 style="color:var(--neon-green); margin-bottom:6px;">${cleanTitle}</h1>
                                 <p style="margin: 6px 0 12px 0; color: var(--grey); font-style: italic;">${anime.title_japanese || ''} ${anime.title_english ? '• ' + anime.title_english : ''}</p>
                                 <div style="margin-bottom:12px;">${genres}</div>
-                                <p style="margin-bottom: 14px; line-height:1.6;">${anime.synopsis || 'No synopsis available.'}</p>
-                                <div style="display:flex; gap:18px; flex-wrap:wrap; align-items:center;">
+                                <p style="margin-bottom: 14px; line-height:1.6;">${cleanedSynopsis}</p>
+                                <a class="mal-link" href="https://myanimelist.net/anime/${anime.mal_id}/" target="_blank" rel="noopener noreferrer">View this anime on MyAnimeList</a>
+                                <div style="display:flex; gap:18px; flex-wrap:wrap; align-items:center; margin-top:16px;">
                                     <div><strong>Type:</strong> ${anime.type || 'Unknown'}</div>
                                     <div><strong>Episodes:</strong> ${anime.episodes || 'TBD'}</div>
                                     <div><strong>Score:</strong> ★ ${anime.score || 'N/A'}</div>
