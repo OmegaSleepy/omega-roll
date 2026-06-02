@@ -55,7 +55,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Render only released episodes (from episodesData) if available; otherwise fallback to numeric list
     if (episodesData.length > 0) {
      episodesData.forEach(ep => {
-        // ep may include ep.episode (number) or we infer order
         const epNumber = ep.episode || ep.mal_id || null;
         if (!epNumber) return;
         const li = document.createElement('li');
@@ -63,13 +62,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const aired = ep.aired ? new Date(ep.aired) : null;
         const released = aired && (!isNaN(aired.getTime())) && aired <= new Date();
         if (!released) return; // do not display unreleased
-        // detect simple dub/sub cues if present
+        const episodeName = getEpisodeTitle(ep, lang);
+        const titleLabel = episodeName ? `Episode ${epNumber}: ${episodeName}` : `Episode ${epNumber}`;
         const hasDub = ep.title && /dub/i.test(ep.title);
         const hasSub = ep.title && /sub/i.test(ep.title);
         const badges = [];
         if (hasSub) badges.push('<small style="color:#a7ffb8; margin-right:6px;">SUB</small>');
         if (hasDub) badges.push('<small style="color:#ffd3a7;">DUB</small>');
-        li.innerHTML = `<a href="watch.html?animeId=${animeId}&ep=${epNumber}">Episode ${epNumber} ${badges.join(' ')}</a>`;
+        li.innerHTML = `<a href="watch.html?animeId=${animeId}&ep=${epNumber}" title="${titleLabel}">${titleLabel} ${badges.join(' ')}</a>`;
         episodeListContainer.appendChild(li);
      });
     } else {
@@ -77,11 +77,66 @@ document.addEventListener("DOMContentLoaded", async () => {
      for (let i = 1; i <= releasedCount; i++) {
         const li = document.createElement('li');
         li.className = 'episode-item';
-        li.innerHTML = `<a href="watch.html?animeId=${animeId}&ep=${i}">Episode ${i}</a>`;
+        li.innerHTML = `<a href="watch.html?animeId=${animeId}&ep=${i}" title="Episode ${i}">Episode ${i}</a>`;
         episodeListContainer.appendChild(li);
      }
+    }
+
+    const recommendationsContainer = document.getElementById('recommendations-section');
+    if (recommendationsContainer) {
+     const recsResp = await fetchFromJikan(`/anime/${animeId}/recommendations`);
+     const recommendations = recsResp && recsResp.data ? recsResp.data : [];
+     const recommendationsSection = renderRecommendations(recommendations);
+     recommendationsContainer.appendChild(recommendationsSection);
     }
  } else {
   detailsContainer.innerHTML = '<p>Error loading metadata for this anime.</p>';
  }
 });
+
+function getEpisodeTitle(ep, lang) {
+ if (!ep) return '';
+ if (lang === 'JP') {
+  return ep.title_romanji || ep.title_japanese || ep.title || '';
+ }
+ return ep.title || ep.title_english || ep.title_japanese || '';
+}
+
+function renderRecommendations(recommendations) {
+ const section = document.createElement('div');
+ section.className = 'section-panel';
+ const heading = document.createElement('h2');
+ heading.textContent = 'Recommendations';
+ section.appendChild(heading);
+
+ if (!Array.isArray(recommendations) || recommendations.length === 0) {
+  const emptyMessage = document.createElement('p');
+  emptyMessage.style.color = 'var(--grey)';
+  emptyMessage.textContent = 'No recommendations available at this time.';
+  section.appendChild(emptyMessage);
+  return section;
+ }
+
+ const grid = document.createElement('div');
+ grid.className = 'anime-grid';
+ recommendations.slice(0, 8).forEach(rec => {
+  const entry = rec.entry || rec;
+  if (!entry) return;
+  if (!entry.mal_id && entry.url) {
+   const malMatch = String(entry.url).match(/mal\.php\?id=(\d+)|anime\/(\d+)/i);
+   if (malMatch) entry.mal_id = malMatch[1] || malMatch[2];
+  }
+  try {
+   grid.appendChild(createAnimeCard(entry));
+  } catch (error) {
+   console.warn('Recommendation render failed for entry:', entry, error);
+  }
+ });
+ section.appendChild(grid);
+ return section;
+}
+
+function getMALIdFromUrl(url) {
+ const match = String(url).match(/mal\.php\?id=(\d+)|anime\/(\d+)/i);
+ return match ? (match[1] || match[2]) : null;
+}

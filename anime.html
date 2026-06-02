@@ -5,12 +5,32 @@
     <title>Anime Details - Omega-Roll</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .details-wrapper { display: flex; gap: 30px; margin-bottom: 40px; flex-wrap: wrap;}
-        .details-poster { width: 300px; border-radius: 8px; border: 2px solid var(--neon-green); max-width: 100%;}
-        .details-info { flex: 1; min-width: 300px; }
-        .episode-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;}
-        .episode-item a { display: block; background-color: var(--card-bg); padding: 15px; color: #fff; text-decoration: none; border-radius: 6px; border-left: 4px solid var(--neon-green); text-align: center; transition: 0.2s;}
-        .episode-item a:hover { background-color: #2e3944; transform: scale(1.03); }
+        .details-wrapper { display: grid; grid-template-columns: minmax(260px, 320px) minmax(320px, 1fr); gap: 30px; margin-bottom: 40px; align-items: start; }
+        .details-poster { width: 100%; max-width: 320px; height: auto; border-radius: 16px; border: 2px solid var(--neon-green); object-fit: cover; }
+        .details-info { min-width: 0; }
+        .episode-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 220px)); justify-content: center; gap: 12px; margin-top: 20px; margin-bottom: 40px; }
+        .episode-item { width: 100%; }
+        .episode-item a {
+            display: block;
+            min-height: 48px;
+            max-height: 48px;
+            padding: 12px 14px;
+            background-color: var(--card-bg);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            border-left: 4px solid var(--neon-green);
+            transition: transform 0.2s, background-color 0.2s;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        .episode-item a:hover { background-color: #2e3944; transform: translateY(-1px); }
+        @media (max-width: 760px) {
+            .details-wrapper { grid-template-columns: 1fr; }
+            .episode-list { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -26,6 +46,8 @@
     <h2 style="border-bottom: 2px solid #222; padding-bottom: 10px;">Select <span class="neon-title">Episode</span></h2>
     <ul class="episode-list" id="episode-list">
     </ul>
+
+    <div id="recommendations-section"></div>
 </main>
 
 <script src="js/api.js"></script>
