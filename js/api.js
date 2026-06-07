@@ -271,7 +271,9 @@ function createAnimeCard(anime) {
 
  const { cleanTitle, seasonText } = parseSeasonFromTitle(chosenRawTitle);
  const seasonBadge = seasonText ? ` | <span style="color:#fff; background:#111; padding:2px 6px; border-radius:4px; font-size:11px; border:1px solid var(--neon-green)">${seasonText}</span>` : '';
- const episodeLabel = isValidAnime(anime) ? ` • ${anime.episodes} eps` : '';
+  const episodeLabel = isValidAnime(anime)
+    ? ` • ${anime.episodes} eps`
+    : ` <span title="We are not sure how many episodes this anime has" style="text-decoration: underline dotted; cursor: help;"> • ? eps</span>`;
  const watchLaterList = JSON.parse(localStorage.getItem('watchLater')) || [];
  const isSaved = watchLaterList.some(item => item.id == anime.mal_id);
 

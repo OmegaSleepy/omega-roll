@@ -35,17 +35,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   const { cleanTitle } = parseSeasonFromTitle(chosenTitle);
 
   // 5. Populate Episode Picker Dropdown Options from released episodes only
-  let totalEpisodes = anime.episodes || 12;
-  let episodeList = [];
-  try {
-   const epsResp = await fetchFromJikan(`/anime/${animeId}/episodes`);
-   if (epsResp && epsResp.data && Array.isArray(epsResp.data) && epsResp.data.length > 0) {
-    episodeList = epsResp.data;
-    totalEpisodes = episodeList.length;
-   }
-  } catch (e) {
-   // ignore and fallback to numeric count
-  }
+    let totalEpisodes = anime.episodes || 12;
+    let episodeList = [];
+    try {
+     // fetch all episode pages to avoid artificial caps (lazy-accumulate pages)
+     let page = 1;
+     while (true) {
+        const epsResp = await fetchFromJikan(`/anime/${animeId}/episodes?page=${page}`);
+        if (!(epsResp && Array.isArray(epsResp.data) && epsResp.data.length > 0)) break;
+        episodeList.push(...epsResp.data);
+        if (!(epsResp.pagination && epsResp.pagination.has_next_page)) break;
+        page += 1;
+     }
+     if (episodeList.length > 0) totalEpisodes = episodeList.length;
+    } catch (e) {
+     // ignore and fallback to numeric count
+    }
 
   epPicker.innerHTML = ''; // Clear placeholder data safely
   if (episodeList.length > 0) {

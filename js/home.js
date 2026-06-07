@@ -6,12 +6,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
  if (data && data.data) {
   const seenIds = new Set();
-  data.data.forEach(anime => {
-   if (!isValidAnime(anime) || seenIds.has(anime.mal_id)) return;
-   seenIds.add(anime.mal_id);
-   const card = createAnimeCard(anime);
-   if (card) trendingGrid.appendChild(card);
-  });
+    data.data.forEach(anime => {
+     if (seenIds.has(anime.mal_id)) return;
+     seenIds.add(anime.mal_id);
+     const card = createAnimeCard(anime);
+     if (card) trendingGrid.appendChild(card);
+    });
  } else {
   trendingGrid.innerHTML = '<p>Failed to load trending content. Please refresh.</p>';
  }

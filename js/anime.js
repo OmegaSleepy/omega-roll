@@ -41,27 +41,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                         </div>
                 `;
 
-    // 2. Fetch released episodes list from API and only render released episodes
-    const episodesResp = await fetchFromJikan(`/anime/${animeId}/episodes`);
-    let releasedCount = 0;
+    // 2. Fetch released episodes list from API and render released episodes with "See more" support
+    let episodesPage = 1;
     let episodesData = [];
+    let episodesResp = await fetchFromJikan(`/anime/${animeId}/episodes?page=${episodesPage}`);
     if (episodesResp && episodesResp.data && Array.isArray(episodesResp.data) && episodesResp.data.length > 0) {
      episodesData = episodesResp.data;
-     releasedCount = episodesData.length;
-    } else {
-     releasedCount = anime.episodes || 0;
     }
 
-    // Render only released episodes (from episodesData) if available; otherwise fallback to numeric list
-    if (episodesData.length > 0) {
-     episodesData.forEach(ep => {
+    const appendEpisodes = (list) => {
+     list.forEach(ep => {
         const epNumber = ep.episode || ep.mal_id || null;
         if (!epNumber) return;
-        const li = document.createElement('li');
-        li.className = 'episode-item';
         const aired = ep.aired ? new Date(ep.aired) : null;
         const released = aired && (!isNaN(aired.getTime())) && aired <= new Date();
         if (!released) return; // do not display unreleased
+        const li = document.createElement('li');
+        li.className = 'episode-item';
         const episodeName = getEpisodeTitle(ep, lang);
         const titleLabel = episodeName ? `Episode ${epNumber}: ${episodeName}` : `Episode ${epNumber}`;
         const hasDub = ep.title && /dub/i.test(ep.title);
@@ -72,8 +68,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         li.innerHTML = `<a href="watch.html?animeId=${animeId}&ep=${epNumber}" title="${titleLabel}">${titleLabel} ${badges.join(' ')}</a>`;
         episodeListContainer.appendChild(li);
      });
+    };
+
+    // initially append data
+    if (episodesData.length > 0) {
+     appendEpisodes(episodesData);
     } else {
-     // fallback: render numeric list up to releasedCount but only if episodes reported
+     // fallback: numeric list
+     const releasedCount = anime.episodes || 0;
      for (let i = 1; i <= releasedCount; i++) {
         const li = document.createElement('li');
         li.className = 'episode-item';
@@ -82,12 +84,91 @@ document.addEventListener("DOMContentLoaded", async () => {
      }
     }
 
-    const recommendationsContainer = document.getElementById('recommendations-section');
-    if (recommendationsContainer) {
-     const recsResp = await fetchFromJikan(`/anime/${animeId}/recommendations`);
-     const recommendations = recsResp && recsResp.data ? recsResp.data : [];
+    // If API has more pages, show a "See more" button to fetch additional pages lazily
+    const showSeeMoreIfNeeded = (resp) => {
+     try {
+      if (resp && resp.pagination && resp.pagination.has_next_page) {
+       const btn = document.createElement('button');
+       btn.className = 'btn';
+       btn.style.display = 'block';
+       btn.style.margin = '12px auto';
+       btn.textContent = 'See more episodes';
+       let loading = false;
+       btn.onclick = async () => {
+        if (loading) return;
+        loading = true;
+        btn.textContent = 'Loading...';
+        episodesPage += 1;
+        const nextResp = await fetchFromJikan(`/anime/${animeId}/episodes?page=${episodesPage}`);
+        if (nextResp && Array.isArray(nextResp.data) && nextResp.data.length > 0) {
+         appendEpisodes(nextResp.data);
+        }
+        if (!(nextResp && nextResp.pagination && nextResp.pagination.has_next_page)) {
+         btn.remove();
+        } else {
+         btn.textContent = 'See more episodes';
+        }
+        loading = false;
+       };
+       episodeListContainer.parentNode.insertBefore(btn, episodeListContainer.nextSibling);
+      }
+     } catch (e) {
+      // silent
+     }
+    };
+
+    showSeeMoreIfNeeded(episodesResp);
+
+   const recommendationsContainer = document.getElementById('recommendations-section');
+   if (recommendationsContainer) {
+    // Rate-limit mitigation: wait a short delay before fetching recommendations and retry once on failure
+    const RECOMMENDATION_DELAY_MS = 1200;
+    const fetchWithDelay = async (endpoint, attempts = 2, baseDelay = RECOMMENDATION_DELAY_MS) => {
+     for (let i = 0; i < attempts; i++) {
+      // initial wait before first attempt as well
+      await new Promise(r => setTimeout(r, baseDelay * (i === 0 ? 1 : 2 ** (i - 1))));
+      const resp = await fetchFromJikan(endpoint);
+      if (resp) return resp;
+     }
+     return null;
+    };
+
+    const recsResp = await fetchWithDelay(`/anime/${animeId}/recommendations`);
+    const recommendations = recsResp && recsResp.data ? recsResp.data : [];
      const recommendationsSection = renderRecommendations(recommendations);
      recommendationsContainer.appendChild(recommendationsSection);
+      // Add "More of X" panel: search for the clean title and show up to 8 related results
+      try {
+       const searchResp = await fetchWithDelay(`/anime?q=${encodeURIComponent(cleanTitle)}&limit=8`);
+       const results = searchResp && searchResp.data ? searchResp.data : [];
+       const filteredResults = Array.isArray(results)
+         ? results.filter(item => {
+             if (!item) return false;
+             if (item.type && String(item.type).toLowerCase() === 'music') return false;
+             return String(item.mal_id) !== String(animeId);
+           })
+         : [];
+       if (filteredResults.length > 0) {
+        const moreSection = document.createElement('div');
+        moreSection.className = 'section-panel';
+        const h = document.createElement('h2');
+        h.textContent = `More of ${cleanTitle}`;
+        moreSection.appendChild(h);
+        const grid = document.createElement('div');
+        grid.className = 'anime-grid';
+        filteredResults.forEach(item => {
+         try {
+          grid.appendChild(createAnimeCard(item));
+         } catch (err) {
+          console.warn('MoreOf render failed for', item, err);
+         }
+        });
+        moreSection.appendChild(grid);
+        recommendationsContainer.appendChild(moreSection);
+       }
+      } catch (e) {
+       // ignore search errors
+      }
     }
  } else {
   detailsContainer.innerHTML = '<p>Error loading metadata for this anime.</p>';
@@ -119,7 +200,11 @@ function renderRecommendations(recommendations) {
 
  const grid = document.createElement('div');
  grid.className = 'anime-grid';
- recommendations.slice(0, 8).forEach(rec => {
+ const filteredRecommendations = recommendations.filter(rec => {
+  const entry = rec.entry || rec;
+  return entry && !(entry.type && String(entry.type).toLowerCase() === 'music');
+ });
+ filteredRecommendations.slice(0, 8).forEach(rec => {
   const entry = rec.entry || rec;
   if (!entry) return;
   if (!entry.mal_id && entry.url) {

@@ -10,12 +10,15 @@ document.addEventListener("DOMContentLoaded", async () => {
  async function loadPage(page) {
   loading = true;
   const data = await fetchFromJikan(`/top/anime?limit=${LIMIT}&page=${page}`);
-  if (data && data.data && data.data.length > 0) {
-   data.data.forEach(anime => {
-    if (!isValidAnime(anime) || seenIds.has(anime.mal_id)) return;
-    seenIds.add(anime.mal_id);
-    exploreGrid.appendChild(createAnimeCard(anime));
-   });
+    if (data && data.data && data.data.length > 0) {
+     data.data.forEach(anime => {
+        if (!anime) return;
+        // Filter out Music entries when browsing
+        if (anime.type && String(anime.type).toLowerCase() === 'music') return;
+        if (seenIds.has(anime.mal_id)) return;
+        seenIds.add(anime.mal_id);
+        exploreGrid.appendChild(createAnimeCard(anime));
+     });
    loading = false;
    return true;
   }

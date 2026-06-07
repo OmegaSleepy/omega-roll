@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  const searchBtn = document.getElementById('search-btn');
  const genreSelect = document.getElementById('search-genre');
  const typeSelect = document.getElementById('search-type');
+ const excludeMusicCheckbox = document.getElementById('exclude-music');
  const statusSelect = document.getElementById('search-status');
  const ratingSelect = document.getElementById('search-rating');
  const orderSelect = document.getElementById('search-order');
@@ -35,7 +36,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   params.set('sort', sortSelect.value);
   params.set('limit', '24');
 
-  if (!query && !genreSelect.value && !typeSelect.value && !statusSelect.value && !ratingSelect.value && !minScoreInput.value) {
+  const excludeMusic = excludeMusicCheckbox.checked;
+  if (!query && !genreSelect.value && !typeSelect.value && !statusSelect.value && !ratingSelect.value && !minScoreInput.value && !excludeMusic) {
    searchResults.innerHTML = '<p style="color: var(--neon-green)">Enter a title or select filters to search.</p>';
    return;
   }
@@ -44,14 +46,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const data = await fetchFromJikan(`/anime?${params.toString()}`);
 
   searchResults.innerHTML = ''; // Clear status text
-  if (data && data.data && data.data.length > 0) {
-   const seenIds = new Set();
-   data.data.forEach(anime => {
-    if (!isValidAnime(anime) || seenIds.has(anime.mal_id)) return;
-    seenIds.add(anime.mal_id);
-    const card = createAnimeCard(anime);
-    if (card) searchResults.appendChild(card);
-   });
+    if (data && data.data && data.data.length > 0) {
+     const seenIds = new Set();
+     data.data.forEach(anime => {
+      if (!anime) return;
+      if (excludeMusic && anime.type && String(anime.type).toLowerCase() === 'music') return;
+      if (seenIds.has(anime.mal_id)) return;
+      seenIds.add(anime.mal_id);
+      const card = createAnimeCard(anime);
+      if (card) searchResults.appendChild(card);
+     });
    if (!searchResults.childElementCount) {
     searchResults.innerHTML = '<p>No anime found matching your filters.</p>';
    }
