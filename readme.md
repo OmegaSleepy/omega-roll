@@ -1,1 +1,1 @@
-https://www.omegasleepy.github.io/omega-roll/
+https://omegasleepy.github.io/omega-roll/
