@@ -1,11 +1,13 @@
 /**
  * Redirect Blocker - Prevents unauthorized redirects to external sites
- * Only allows redirects to myanimelist.net
+ * Only allows redirects to myanimelist.net and Jikan API
  */
 
 const ALLOWED_DOMAINS = [
   'myanimelist.net',
-  'www.myanimelist.net'
+  'www.myanimelist.net',
+  'api.jikan.moe',
+  'jikan.moe'
 ];
 
 const BLOCKED_DOMAINS = [
@@ -189,4 +191,4 @@ Object.defineProperty(window, 'location', {
   }
 });
 
-console.log('🛡️ Redirect blocker initialized - Only myanimelist.net external redirects allowed');
+console.log('🛡️ Redirect blocker initialized - Allowed: myanimelist.net, Jikan API');
