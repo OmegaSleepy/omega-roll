@@ -2,11 +2,10 @@ document.addEventListener("DOMContentLoaded", async () => {
  const params = new URLSearchParams(window.location.search);
  const animeId = params.get('animeId');
  let currentEp = parseInt(params.get('ep')) || 1;
- let currentMode = "SUB"; // ✅ FIX 1: Define currentMode globally within this scope
-
- if (!animeId) {
-  window.location.href = 'index.html';
-  return;
+ let currentMode = "SUB";
+ const storedMode = localStorage.getItem('preferredAudioMode');
+ if (storedMode === 'SUB' || storedMode === 'DUB') {
+  currentMode = storedMode;
  }
 
  document.getElementById('back-to-anime').href = `anime.html?id=${animeId}`;
@@ -95,21 +94,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.location.href = `watch.html?animeId=${animeId}&ep=${e.target.value}`;
  };
 
+ function setActiveAudioButton(mode) {
+  if (mode === "DUB") {
+   btnDub.classList.add('active');
+   btnSub.classList.remove('active');
+  } else {
+   btnSub.classList.add('active');
+   btnDub.classList.remove('active');
+  }
+ }
+
  // Sub / Dub structural audio track selectors
  btnSub.onclick = () => { toggleAudioMode("SUB"); };
  btnDub.onclick = () => { toggleAudioMode("DUB"); };
 
  function toggleAudioMode(mode) {
-  currentMode = mode; // ✅ FIX 2: Actually update the variable when clicked
-  if (mode === "SUB") {
-   btnSub.classList.add('active');
-   btnDub.classList.remove('active');
-  } else {
-   btnDub.classList.add('active');
-   btnSub.classList.remove('active');
-  }
+  currentMode = mode;
+  localStorage.setItem('preferredAudioMode', mode);
+  setActiveAudioButton(mode);
   updatePlayer();
  }
+
+ setActiveAudioButton(currentMode);
 
  function getEpisodeTitle(ep, lang) {
   if (!ep) return '';
