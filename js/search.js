@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  const searchResults = document.getElementById('search-results');
 
  async function populateGenreOptions() {
-  const genreData = await fetchFromJikan('/genres/anime');
+  const genreData = await fetchFromTenrai('/genres/anime');
   if (genreData && genreData.data) {
    genreData.data.slice(0, 25).forEach(genre => {
     const opt = document.createElement('option');
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   searchResults.innerHTML = '<p style="color: var(--neon-green)">Searching database...</p>';
-  const data = await fetchFromJikan(`/anime?${params.toString()}`);
+  const data = await fetchFromTenrai(`/anime?${params.toString()}`);
 
   searchResults.innerHTML = ''; // Clear status text
     if (data && data.data && data.data.length > 0) {

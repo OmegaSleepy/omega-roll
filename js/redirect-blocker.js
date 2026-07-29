@@ -1,11 +1,13 @@
 /**
  * Redirect Blocker - Prevents unauthorized redirects to external sites
- * Only allows redirects to myanimelist.net and Jikan API
+ * Only allows redirects to myanimelist.net and Tenrai API
  */
 
 const ALLOWED_DOMAINS = [
   'myanimelist.net',
   'www.myanimelist.net',
+  'api.tenrai.org',
+  'tenrai.org',
   'api.jikan.moe',
   'jikan.moe'
 ];
@@ -191,4 +193,4 @@ Object.defineProperty(window, 'location', {
   }
 });
 
-console.log('🛡️ Redirect blocker initialized - Allowed: myanimelist.net, Jikan API');
+console.log('🛡️ Redirect blocker initialized - Allowed: myanimelist.net, Tenrai API');

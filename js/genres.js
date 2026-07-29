@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", async () => {
  const resultGrid = document.getElementById('genre-anime-grid');
  const resultTitle = document.getElementById('genre-result-title');
 
- // Fetch official categories directly from Jikan endpoints
- const genreData = await fetchFromJikan('/genres/anime');
+ // Fetch official categories directly from Tenrai endpoints
+ const genreData = await fetchFromTenrai('/genres/anime');
 
  if (!genreData || !genreData.data) {
   genresContainer.innerText = "Failed loading categories.";
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  async function loadGenrePage(genreId, page) {
   if (genreLoading) return false;
   genreLoading = true;
-  const response = await fetchFromJikan(`/anime?genres=${genreId}&order_by=score&sort=desc&limit=${GENRE_LIMIT}&page=${page}`);
+  const response = await fetchFromTenrai(`/anime?genres=${genreId}&order_by=score&sort=desc&limit=${GENRE_LIMIT}&page=${page}`);
   genreLoading = false;
   if (response && response.data && response.data.length > 0) {
    response.data.forEach(anime => {

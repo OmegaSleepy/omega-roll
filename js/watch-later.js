@@ -24,7 +24,7 @@ function renderSavedAnime() {
     return;
  }
 
- Promise.all(savedSeries.map(item => fetchFromJikan(`/anime/${item.id}`).then(r => ({ saved: item, data: r && r.data ? r.data : null })).catch(() => ({ saved: item, data: null }))))
+ Promise.all(savedSeries.map(item => fetchFromTenrai(`/anime/${item.id}`).then(r => ({ saved: item, data: r && r.data ? r.data : null })).catch(() => ({ saved: item, data: null }))))
     .then(results => {
      const merged = results.map(r => {
         const saved = r.saved;

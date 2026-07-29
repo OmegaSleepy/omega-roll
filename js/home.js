@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", async () => {
  const trendingGrid = document.getElementById('trending-grid');
 
- // Fetch seasonal streaming anime from Jikan
- const data = await fetchFromJikan('/seasons/now?limit=12');
+ // Fetch seasonal streaming anime from Tenrai
+ const data = await fetchFromTenrai('/seasons/now?limit=12');
 
  if (data && data.data) {
   const seenIds = new Set();

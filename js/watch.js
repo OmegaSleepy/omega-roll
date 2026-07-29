@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  const videoPlayer = document.getElementById('anime-video');
 
  // 1. Fetch the raw API response safely
- const apiResponse = await fetchFromJikan(`/anime/${animeId}`);
+ const apiResponse = await fetchFromTenrai(`/anime/${animeId}`);
 
  if (apiResponse && apiResponse.data) {
   // 2. Extract the inner data object into a cleanly named variable
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
      // fetch all episode pages to avoid artificial caps (lazy-accumulate pages)
      let page = 1;
      while (true) {
-        const epsResp = await fetchFromJikan(`/anime/${animeId}/episodes?page=${page}`);
+        const epsResp = await fetchFromTenrai(`/anime/${animeId}/episodes?page=${page}`);
         if (!(epsResp && Array.isArray(epsResp.data) && epsResp.data.length > 0)) break;
         episodeList.push(...epsResp.data);
         if (!(epsResp.pagination && epsResp.pagination.has_next_page)) break;

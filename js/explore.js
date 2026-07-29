@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
  async function loadPage(page) {
   loading = true;
-  const data = await fetchFromJikan(`/top/anime?limit=${LIMIT}&page=${page}`);
+  const data = await fetchFromTenrai(`/top/anime?limit=${LIMIT}&page=${page}`);
     if (data && data.data && data.data.length > 0) {
      data.data.forEach(anime => {
         if (!anime) return;

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  const episodeListContainer = document.getElementById('episode-list');
 
  // 1. Fetch Anime Metadata
- const animeData = await fetchFromJikan(`/anime/${animeId}`);
+ const animeData = await fetchFromTenrai(`/anime/${animeId}`);
  if (animeData && animeData.data) {
     const anime = animeData.data;
     const lang = localStorage.getItem('globalLanguage') || 'EN';
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 2. Fetch released episodes list from API and render released episodes with "See more" support
     let episodesPage = 1;
     let episodesData = [];
-    let episodesResp = await fetchFromJikan(`/anime/${animeId}/episodes?page=${episodesPage}`);
+    let episodesResp = await fetchFromTenrai(`/anime/${animeId}/episodes?page=${episodesPage}`);
     if (episodesResp && episodesResp.data && Array.isArray(episodesResp.data) && episodesResp.data.length > 0) {
      episodesData = episodesResp.data;
     }
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         loading = true;
         btn.textContent = 'Loading...';
         episodesPage += 1;
-        const nextResp = await fetchFromJikan(`/anime/${animeId}/episodes?page=${episodesPage}`);
+        const nextResp = await fetchFromTenrai(`/anime/${animeId}/episodes?page=${episodesPage}`);
         if (nextResp && Array.isArray(nextResp.data) && nextResp.data.length > 0) {
          appendEpisodes(nextResp.data);
         }
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
      for (let i = 0; i < attempts; i++) {
       // initial wait before first attempt as well
       await new Promise(r => setTimeout(r, baseDelay * (i === 0 ? 1 : 2 ** (i - 1))));
-      const resp = await fetchFromJikan(endpoint);
+      const resp = await fetchFromTenrai(endpoint);
       if (resp) return resp;
      }
      return null;

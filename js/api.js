@@ -1,4 +1,5 @@
-const API_BASE = "https://api.jikan.moe/v4";
+const API_BASE = "https://api.tenrai.org/v1";
+const FALLBACK_API_BASE = "https://api.jikan.moe/v4";
 const LIVECHART_API_BASE = "https://www.livechart.me/api/v1";
 
 // Automatically inject consistent header & language bar when DOM loads
@@ -228,15 +229,30 @@ function toggleSchedulePanel(show) {
 }
 
 // Fetch framework utility
-async function fetchFromJikan(endpoint) {
- try {
-  const response = await fetch(`${API_BASE}${endpoint}`);
-  if (!response.ok) throw new Error('Network response was not ok');
-  return await response.json();
- } catch (error) {
-  console.error("API Fetch Error:", error);
-  return null;
+async function fetchFromTenrai(endpoint) {
+ const sources = [
+  { name: 'Tenrai', base: API_BASE },
+  { name: 'Jikan', base: FALLBACK_API_BASE }
+ ];
+
+ for (const source of sources) {
+  try {
+   const response = await fetch(`${source.base}${endpoint}`, {
+    headers: { Accept: 'application/json' }
+   });
+   if (!response.ok) throw new Error(`${source.name} response was not ok`);
+   return await response.json();
+  } catch (error) {
+   console.warn(`${source.name} request failed for ${endpoint}:`, error);
+  }
  }
+
+ console.error("API Fetch Error:", endpoint);
+ return null;
+}
+
+async function fetchFromJikan(endpoint) {
+ return fetchFromTenrai(endpoint);
 }
 
 // Cleans "Season N" from title string matching regulatory syntax regex
