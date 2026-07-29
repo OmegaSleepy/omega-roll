@@ -41,20 +41,31 @@ function initializeLanguageToggle() {
 
  updateLanguageToggleUI();
 
- document.getElementById('lang-en').onclick = () => {
-  localStorage.setItem('globalLanguage', 'EN');
-  window.location.reload();
- };
- document.getElementById('lang-jp').onclick = () => {
-  localStorage.setItem('globalLanguage', 'JP');
-  window.location.reload();
- };
+ const enBtn = document.getElementById('lang-en');
+ const jpBtn = document.getElementById('lang-jp');
+
+ // Only add listeners if buttons exist (e.g., not on about page)
+ if (enBtn) {
+  enBtn.onclick = () => {
+   localStorage.setItem('globalLanguage', 'EN');
+   window.location.reload();
+  };
+ }
+ if (jpBtn) {
+  jpBtn.onclick = () => {
+   localStorage.setItem('globalLanguage', 'JP');
+   window.location.reload();
+  };
+ }
 }
 
 function updateLanguageToggleUI() {
  const currentLang = localStorage.getItem('globalLanguage');
  const enBtn = document.getElementById('lang-en');
  const jpBtn = document.getElementById('lang-jp');
+
+ // Skip if buttons don't exist (e.g., on about page)
+ if (!enBtn || !jpBtn) return;
 
  if (currentLang === 'EN') {
   enBtn.style.background = 'var(--neon-green)';
