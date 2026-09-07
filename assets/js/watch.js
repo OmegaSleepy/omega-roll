@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentMode = storedMode;
  }
 
- document.getElementById('back-to-anime').href = `anime.html?id=${animeId}`;
+ document.getElementById('back-to-anime').href = `/pages/anime.html?id=${animeId}`;
 
  const videoTitle = document.getElementById('video-title');
  const epPicker = document.getElementById('ep-picker');
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     button.addEventListener('click', () => {
      const chosenEp = Number(button.dataset.ep);
      if (!isNaN(chosenEp)) {
-      window.location.href = `watch.html?animeId=${animeId}&ep=${chosenEp}`;
+      window.location.href = `/pages/watch.html?animeId=${animeId}&ep=${chosenEp}`;
      }
     });
    });
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   prevEpisodeBtn.onclick = () => {
    if (currentEp > 1) {
     const previousEp = Math.max(...parsedEpisodeOptions.map(ep => ep.number).filter(n => n < currentEp), 1);
-    window.location.href = `watch.html?animeId=${animeId}&ep=${previousEp}`;
+    window.location.href = `/pages/watch.html?animeId=${animeId}&ep=${previousEp}`;
    }
   };
 
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
    const maxEp = Math.max(...parsedEpisodeOptions.map(ep => ep.number), currentEp);
    if (currentEp < maxEp) {
     const nextEp = Math.min(...parsedEpisodeOptions.map(ep => ep.number).filter(n => n > currentEp), maxEp);
-    window.location.href = `watch.html?animeId=${animeId}&ep=${nextEp}`;
+    window.location.href = `/pages/watch.html?animeId=${animeId}&ep=${nextEp}`;
    }
   };
 
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
  // Dropdown event handling to swap episodes dynamically
  epPicker.onchange = (e) => {
-  window.location.href = `watch.html?animeId=${animeId}&ep=${e.target.value}`;
+  window.location.href = `/pages/watch.html?animeId=${animeId}&ep=${e.target.value}`;
  };
 
  function setActiveAudioButton(mode) {

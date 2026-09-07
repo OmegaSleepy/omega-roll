@@ -32,10 +32,11 @@ function isSafeRedirect(url) {
   if (!url) return false;
   
   // Allow relative URLs and internal navigation
-  if (url.startsWith('/') || url.startsWith('#') || url === 'index.html' || 
-      url.startsWith('index.html') || url.startsWith('anime.html') || 
-      url.startsWith('explore.html') || url.startsWith('genres.html') ||
-      url.startsWith('search.html') || url.startsWith('watch-later.html')) {
+  if (url.startsWith('/') || url.startsWith('#') || url === '/index.html' || 
+      url.startsWith('/index.html') || url.startsWith('/pages/anime.html') || 
+      url.startsWith('/pages/explore.html') || url.startsWith('/pages/genres.html') ||
+      url.startsWith('/pages/search.html') || url.startsWith('/pages/watch-later.html') ||
+      url.startsWith('/pages/watch.html') || url.startsWith('/pages/about.html')) {
     return true;
   }
   

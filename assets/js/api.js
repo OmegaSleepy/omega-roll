@@ -16,13 +16,13 @@ function injectConsistentHeader() {
  const currentPath = window.location.pathname.split("/").pop() || "index.html";
 
  existingHeader.innerHTML = `
-        <a href="index.html" class="logo">Omega-Roll</a>
+        <a href="/index.html" class="logo">Omega-Roll</a>
         <nav style="display: flex; align-items: center; gap: 20px;">
-            <a href="index.html" class="${currentPath === 'index.html' ? 'active' : ''}">Home</a>
-            <a href="explore.html" class="${currentPath === 'explore.html' ? 'active' : ''}">Browse</a>
-            <a href="genres.html" class="${currentPath === 'genres.html' ? 'active' : ''}">Genres</a>
-            <a href="search.html" class="${currentPath === 'search.html' ? 'active' : ''}">Search</a>
-            <a href="watch-later.html" class="${currentPath === 'watch-later.html' ? 'active' : ''}">Watch Later</a>
+            <a href="/index.html" class="${currentPath === 'index.html' ? 'active' : ''}">Home</a>
+            <a href="/pages/explore.html" class="${currentPath === 'explore.html' ? 'active' : ''}">Browse</a>
+            <a href="/pages/genres.html" class="${currentPath === 'genres.html' ? 'active' : ''}">Genres</a>
+            <a href="/pages/search.html" class="${currentPath === 'search.html' ? 'active' : ''}">Search</a>
+            <a href="/pages/watch-later.html" class="${currentPath === 'watch-later.html' ? 'active' : ''}">Watch Later</a>
         </nav>
         <div style="display: flex; align-items: center; gap: 12px;">
             <button id="schedule-toggle" class="header-action-btn">Schedule</button>
@@ -169,7 +169,7 @@ function renderScheduleItem(entry) {
  const premiereDate = entry.premiere_date ? new Date(entry.premiere_date) : null;
  const timeText = premiereDate ? ` • ${premiereDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : '';
  const malId = getMALIdFromUrl(entry.mal_url);
- const href = malId ? `anime.html?id=${malId}` : (entry.mal_url || '#');
+ const href = malId ? `/pages/anime.html?id=${malId}` : (entry.mal_url || '#');
  const target = malId ? '' : ' target="_blank" rel="noopener noreferrer"';
  const title = entry.english_title || entry.romaji_title || entry.native_title || 'Unknown Title';
  const typeText = getAnimeTypeLabel(entry.anime_type_d || entry.anime_type);
@@ -308,12 +308,12 @@ function createAnimeCard(anime) {
 
  card.innerHTML = `
         <div style="position: relative; height: 260px;">
-            <img src="${anime.images.jpg.large_image_url}" alt="${cleanTitle}" onclick="window.location.href='anime.html?id=${anime.mal_id}'">
+            <img src="${anime.images.jpg.large_image_url}" alt="${cleanTitle}" onclick="window.location.href='/pages/anime.html?id=${anime.mal_id}'">
             <button class="watchlist-btn ${isSaved ? 'saved' : ''}" data-id="${anime.mal_id}" data-title="${encodeURIComponent(chosenRawTitle || anime.title)}" data-title-jp="${encodeURIComponent(anime.title_japanese || anime.title)}" data-img="${anime.images.jpg.large_image_url}">
                 ${isSaved ? '★ Saved' : '☆ Watch Later'}
             </button>
         </div>
-        <div class="info" onclick="window.location.href='anime.html?id=${anime.mal_id}'">
+        <div class="info" onclick="window.location.href='/pages/anime.html?id=${anime.mal_id}'">
             <h3>${cleanTitle}</h3>
             <div class="anime-card-meta">
                 <span class="anime-card-score">★ ${anime.score || 'N/A'}</span>

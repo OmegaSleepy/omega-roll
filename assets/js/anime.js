@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  const animeId = params.get('id');
 
  if (!animeId) {
-  window.location.href = 'index.html';
+  window.location.href = '/index.html';
   return;
  }
 
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const badges = [];
         if (hasSub) badges.push('<small style="color:#a7ffb8; margin-right:6px;">SUB</small>');
         if (hasDub) badges.push('<small style="color:#ffd3a7;">DUB</small>');
-        li.innerHTML = `<a href="watch.html?animeId=${animeId}&ep=${epNumber}" title="${titleLabel}">${titleLabel} ${badges.join(' ')}</a>`;
+        li.innerHTML = `<a href="/pages/watch.html?animeId=${animeId}&ep=${epNumber}" title="${titleLabel}">${titleLabel} ${badges.join(' ')}</a>`;
         episodeListContainer.appendChild(li);
      });
     };
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
      for (let i = 1; i <= releasedCount; i++) {
         const li = document.createElement('li');
         li.className = 'episode-item';
-        li.innerHTML = `<a href="watch.html?animeId=${animeId}&ep=${i}" title="Episode ${i}">Episode ${i}</a>`;
+        li.innerHTML = `<a href="/pages/watch.html?animeId=${animeId}&ep=${i}" title="Episode ${i}">Episode ${i}</a>`;
         episodeListContainer.appendChild(li);
      }
     }
