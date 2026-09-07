@@ -95,7 +95,7 @@ function renderContinueWatching() {
                 <span>${episodeLabel}</span>
             </div>
         `;
-  card.onclick = () => window.location.href = `/pages/watch.html?animeId=${item.animeId}&ep=${lastEpisode}`;
+  card.onclick = () => window.location.href = `${window.resolveSitePath('/pages/watch.html')}?animeId=${item.animeId}&ep=${lastEpisode}`;
 
   const removeButton = card.querySelector('.remove-continue-btn');
   if (removeButton) {
@@ -132,11 +132,11 @@ function renderPinnedEpisodes() {
 
   card.innerHTML = `
             <div class="pin-card-content">
-                <h4 onclick="window.location.href='/pages/watch.html?animeId=${pin.animeId}&ep=${pin.episode}'">${pin.title}</h4>
+                <h4 onclick="window.location.href='${window.resolveSitePath('/pages/watch.html')}?animeId=${pin.animeId}&ep=${pin.episode}'">${pin.title}</h4>
                 <p>Episode ${pin.episode}</p>
             </div>
             <div class="pin-card-actions">
-                <button class="icon-btn play-btn" title="Resume" onclick="window.location.href='/pages/watch.html?animeId=${pin.animeId}&ep=${pin.episode}'">▶</button>
+                <button class="icon-btn play-btn" title="Resume" onclick="window.location.href='${window.resolveSitePath('/pages/watch.html')}?animeId=${pin.animeId}&ep=${pin.episode}'">▶</button>
                 <button class="icon-btn delete-btn" title="Delete" data-index="${index}">🗑</button>
             </div>
         `;

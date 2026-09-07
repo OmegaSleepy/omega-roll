@@ -3,9 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Genres & Themes - Omega-Roll</title>
-    <link rel="icon" href="/images/icon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <script>
+        window.siteRoot = /github\.io/i.test(window.location.hostname) ? '/omega-roll' : '';
+        window.resolveSitePath = (path) => `${window.siteRoot}${path.startsWith('/') ? path : '/' + path}`;
+    </script>
+    <link rel="icon" id="site-favicon" href="">
+    <link rel="shortcut icon" id="site-favicon-alt" href="">
+    <link rel="stylesheet" id="site-style" href="../assets/css/style.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const favicon = document.getElementById('site-favicon');
+            const faviconAlt = document.getElementById('site-favicon-alt');
+            const style = document.getElementById('site-style');
+            if (favicon) favicon.href = window.resolveSitePath('/images/icon.ico');
+            if (faviconAlt) faviconAlt.href = window.resolveSitePath('/images/icon.ico');
+            if (style) style.href = window.resolveSitePath('/assets/css/style.css');
+        });
+    </script>
     <style>
         .genre-pill-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
         .genre-pill { background: #111; border: 1px solid var(--grey); padding: 8px 16px; border-radius: 20px; color: #fff; cursor: pointer; transition: 0.2s; font-size: 14px; }
@@ -14,7 +28,7 @@
 </head>
 <body>
 <header>
-    <a href="/index.html" class="logo">Omega-Roll</a>
+    <a href="../index.html" class="logo">Omega-Roll</a>
 </header>
 
 <main class="container">
@@ -25,8 +39,8 @@
     <div class="anime-grid" id="genre-anime-grid"></div>
 </main>
 
-<script src="/assets/js/header.js"></script>
-<script src="/assets/js/api.js"></script>
-<script src="/assets/js/genres.js"></script>
+<script src="../assets/js/header.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/genres.js"></script>
 </body>
 </html>

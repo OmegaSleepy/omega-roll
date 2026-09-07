@@ -3,9 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>My Dashboard - Omega-Roll</title>
-    <link rel="icon" href="/images/icon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <script>
+        window.siteRoot = /github\.io/i.test(window.location.hostname) ? '/omega-roll' : '';
+        window.resolveSitePath = (path) => `${window.siteRoot}${path.startsWith('/') ? path : '/' + path}`;
+    </script>
+    <link rel="icon" id="site-favicon" href="">
+    <link rel="shortcut icon" id="site-favicon-alt" href="">
+    <link rel="stylesheet" id="site-style" href="../assets/css/style.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const favicon = document.getElementById('site-favicon');
+            const faviconAlt = document.getElementById('site-favicon-alt');
+            const style = document.getElementById('site-style');
+            if (favicon) favicon.href = window.resolveSitePath('/images/icon.ico');
+            if (faviconAlt) faviconAlt.href = window.resolveSitePath('/images/icon.ico');
+            if (style) style.href = window.resolveSitePath('/assets/css/style.css');
+        });
+    </script>
     <style>
         /* Base Container & Grid Adjustments */
         .container {
@@ -232,8 +246,8 @@
     </section>
 </main>
 
-<script src="/assets/js/header.js"></script>
-<script src="/assets/js/api.js"></script>
-<script src="/assets/js/watch-later.js"></script>
+<script src="../assets/js/header.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/watch-later.js"></script>
 </body>
 </html>

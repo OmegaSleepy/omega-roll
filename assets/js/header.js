@@ -1,3 +1,6 @@
+window.siteRoot = /github\.io/i.test(window.location.hostname) ? '/omega-roll' : '';
+window.resolveSitePath = (path) => `${window.siteRoot}${path.startsWith('/') ? path : '/' + path}`;
+
 // Unified header for all pages
 document.addEventListener('DOMContentLoaded', () => {
     const currentPage = getCurrentPage();
@@ -7,14 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (headerElement) {
         headerElement.innerHTML = `
             <a href="#main-content" class="skip-link">Skip to content</a>
-            <a href="/index.html" class="logo" aria-label="Omega-Roll home">Omega-Roll</a>
+            <a href="${window.resolveSitePath('/index.html')}" class="logo" aria-label="Omega-Roll home">Omega-Roll</a>
             <nav aria-label="Primary">
-                <a href="/index.html" ${currentPage === 'index' ? 'class="active"' : ''}>Home</a>
-                <a href="/pages/explore.html" ${currentPage === 'explore' ? 'class="active"' : ''}>Explore</a>
-                <a href="/pages/search.html" ${currentPage === 'search' ? 'class="active"' : ''}>Search</a>
-                <a href="/pages/genres.html" ${currentPage === 'genres' ? 'class="active"' : ''}>Genres</a>
-                <a href="/pages/watch-later.html" ${currentPage === 'watch-later' ? 'class="active"' : ''}>Watch Later</a>
-                <a href="/pages/about.html" ${currentPage === 'about' ? 'class="active"' : ''}>About</a>
+                <a href="${window.resolveSitePath('/index.html')}" ${currentPage === 'index' ? 'class="active"' : ''}>Home</a>
+                <a href="${window.resolveSitePath('/pages/explore.html')}" ${currentPage === 'explore' ? 'class="active"' : ''}>Explore</a>
+                <a href="${window.resolveSitePath('/pages/search.html')}" ${currentPage === 'search' ? 'class="active"' : ''}>Search</a>
+                <a href="${window.resolveSitePath('/pages/genres.html')}" ${currentPage === 'genres' ? 'class="active"' : ''}>Genres</a>
+                <a href="${window.resolveSitePath('/pages/watch-later.html')}" ${currentPage === 'watch-later' ? 'class="active"' : ''}>Watch Later</a>
+                <a href="${window.resolveSitePath('/pages/about.html')}" ${currentPage === 'about' ? 'class="active"' : ''}>About</a>
             </nav>
             <div class="header-actions">
                 <button type="button" class="header-action-btn" id="shortcut-help-btn" aria-expanded="false" aria-controls="shortcut-help">Shortcuts</button>
@@ -52,12 +55,12 @@ function attachKeyboardSupport() {
     }
 
     const pageMap = {
-        h: '/index.html',
-        e: '/pages/explore.html',
-        s: '/pages/search.html',
-        g: '/pages/genres.html',
-        l: '/pages/watch-later.html',
-        a: '/pages/about.html'
+        h: window.resolveSitePath('/index.html'),
+        e: window.resolveSitePath('/pages/explore.html'),
+        s: window.resolveSitePath('/pages/search.html'),
+        g: window.resolveSitePath('/pages/genres.html'),
+        l: window.resolveSitePath('/pages/watch-later.html'),
+        a: window.resolveSitePath('/pages/about.html')
     };
 
     const isTypingTarget = (target) => {

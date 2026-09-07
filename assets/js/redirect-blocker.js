@@ -3,6 +3,9 @@
  * Only allows redirects to myanimelist.net and Tenrai API
  */
 
+window.siteRoot = /github\.io/i.test(window.location.hostname) ? '/omega-roll' : '';
+window.resolveSitePath = (path) => `${window.siteRoot}${path.startsWith('/') ? path : '/' + path}`;
+
 const ALLOWED_DOMAINS = [
   'myanimelist.net',
   'www.myanimelist.net',
@@ -32,11 +35,11 @@ function isSafeRedirect(url) {
   if (!url) return false;
   
   // Allow relative URLs and internal navigation
-  if (url.startsWith('/') || url.startsWith('#') || url === '/index.html' || 
-      url.startsWith('/index.html') || url.startsWith('/pages/anime.html') || 
-      url.startsWith('/pages/explore.html') || url.startsWith('/pages/genres.html') ||
-      url.startsWith('/pages/search.html') || url.startsWith('/pages/watch-later.html') ||
-      url.startsWith('/pages/watch.html') || url.startsWith('/pages/about.html')) {
+  if (url.startsWith('/') || url.startsWith('#') || url === window.resolveSitePath('/index.html') || 
+      url.startsWith(window.resolveSitePath('/index.html')) || url.startsWith(window.resolveSitePath('/pages/anime.html')) || 
+      url.startsWith(window.resolveSitePath('/pages/explore.html')) || url.startsWith(window.resolveSitePath('/pages/genres.html')) ||
+      url.startsWith(window.resolveSitePath('/pages/search.html')) || url.startsWith(window.resolveSitePath('/pages/watch-later.html')) ||
+      url.startsWith(window.resolveSitePath('/pages/watch.html')) || url.startsWith(window.resolveSitePath('/pages/about.html'))) {
     return true;
   }
   
