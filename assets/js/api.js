@@ -285,51 +285,57 @@ function isValidAnime(anime) {
  return Number(eps) > 0;
 }
 
-// Shared Component UI Card factory processing global title toggle strings
 function createAnimeCard(anime) {
- const card = document.createElement('div');
- card.className = 'anime-card';
+    const card = document.createElement('div');
+    card.className = 'anime-card';
+    
+    // Force consistent card layout, sizing, and uniform spacing
+    card.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    `;
 
- // Toggle logic path selection mapping choice
- const isJP = localStorage.getItem('globalLanguage') === 'JP';
- const isEN = localStorage.getItem('globalLanguage') === 'EN';
- let chosenRawTitle = anime.title;
- if (isJP && anime.title_japanese) chosenRawTitle = anime.title_japanese;
- else if (isEN && anime.title_english) chosenRawTitle = anime.title_english;
+    const title = anime.title_english || anime.title || 'Unknown Title';
+    const imageUrl = anime.images?.jpg?.image_url || anime.image_url || '';
+    const score = anime.score ? `★ ${anime.score}` : 'N/A';
+    const episodes = anime.episodes ? `${anime.episodes} eps` : 'TBD';
 
- const { cleanTitle, seasonText } = parseSeasonFromTitle(chosenRawTitle);
- const seasonBadge = seasonText ? ` | <span style="color:#fff; background:#111; padding:2px 6px; border-radius:4px; font-size:11px; border:1px solid var(--neon-green)">${seasonText}</span>` : '';
-  const episodeLabel = isValidAnime(anime)
-    ? ` • ${anime.episodes} eps`
-    : ` <span title="We are not sure how many episodes this anime has" style="text-decoration: underline dotted; cursor: help;"> • ? eps</span>`;
- const watchLaterList = JSON.parse(localStorage.getItem('watchLater')) || [];
- const isSaved = watchLaterList.some(item => item.id == anime.mal_id);
-
- const formattedSeasonText = seasonText ? seasonText.replace(/\s*\|\s*/g, ' • ') : '';
-
- card.innerHTML = `
-        <div style="position: relative; height: 260px;">
-            <img src="${anime.images.jpg.large_image_url}" alt="${cleanTitle}" onclick="window.location.href='${window.resolveSitePath('/pages/anime.html')}?id=${anime.mal_id}'">
-            <button class="watchlist-btn ${isSaved ? 'saved' : ''}" data-id="${anime.mal_id}" data-title="${encodeURIComponent(chosenRawTitle || anime.title)}" data-title-jp="${encodeURIComponent(anime.title_japanese || anime.title)}" data-img="${anime.images.jpg.large_image_url}">
-                ${isSaved ? '★ Saved' : '☆ Watch Later'}
-            </button>
+    card.innerHTML = `
+        <div style="width: 100%; aspect-ratio: 2/3; overflow: hidden; background: #000; position: relative;">
+            <img src="${imageUrl}" alt="${title}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <div class="info" onclick="window.location.href='${window.resolveSitePath('/pages/anime.html')}?id=${anime.mal_id}'">
-            <h3>${cleanTitle}</h3>
-            <div class="anime-card-meta">
-                <span class="anime-card-score">★ ${anime.score || 'N/A'}</span>
-                <span class="anime-card-badge">${anime.episodes || '?'} eps</span>
-                ${formattedSeasonText ? `<span class="anime-card-badge anime-card-badge-alt">${formattedSeasonText}</span>` : ''}
+        <div style="padding: 12px; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; gap: 8px;">
+            <h4 style="font-size: 0.9rem; font-weight: 600; line-height: 1.3; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.6em; color: #fff;" title="${title}">
+                ${title}
+            </h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #8b949e; margin-top: auto; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+                <span style="background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; color: #fff;">${score}</span>
+                <span>${episodes}</span>
             </div>
         </div>
     `;
 
- card.querySelector('.watchlist-btn').addEventListener('click', (e) => {
-  e.stopPropagation();
-  toggleWatchLater(e.target);
- });
+    card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-4px)';
+        card.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0)';
+        card.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+    });
 
- return card;
+    card.addEventListener('click', () => {
+        window.location.href = `${window.resolveSitePath('/pages/anime.html')}?id=${anime.mal_id}`;
+    });
+
+    return card;
 }
 
 function toggleWatchLater(button) {
