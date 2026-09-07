@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function renderSavedAnime() {
  const savedGrid = document.getElementById('saved-anime-grid');
  const savedSeries = JSON.parse(localStorage.getItem('watchLater')) || [];
- const isJP = localStorage.getItem('globalLanguage') === 'JP';
  const query = (document.getElementById('wl-search') || {}).value || '';
  const sortBy = (document.getElementById('wl-sort') || {}).value || 'added_desc';
 
@@ -32,9 +31,11 @@ function renderSavedAnime() {
         return {
          mal_id: saved.id,
          title: saved.title,
+         title_english: d ? d.title_english : saved.title,
          title_japanese: saved.title_japanese || saved.title,
          score: d ? d.score : null,
-         images: { jpg: { large_image_url: saved.img } },
+         image_url: saved.img,
+         images: { jpg: { image_url: saved.img } },
          episodes: d ? d.episodes : null,
          airedFrom: d && d.aired && d.aired.from ? new Date(d.aired.from) : null,
          addedAt: saved.addedAt || 0
@@ -50,7 +51,7 @@ function renderSavedAnime() {
      filtered.sort((a, b) => {
         switch (sortBy) {
          case 'rating_desc': return (b.score || 0) - (a.score || 0);
-         case 'rating_asc': return (a.score || 0) - (b.score || 0);
+         case 'rating_asc': return (a.score || 0) - (a.score || 0);
          case 'release_desc': return (b.airedFrom ? b.airedFrom.getTime() : 0) - (a.airedFrom ? a.airedFrom.getTime() : 0);
          case 'episodes_desc': return (b.episodes || 0) - (a.episodes || 0);
          case 'added_desc':
@@ -76,26 +77,57 @@ function renderContinueWatching() {
   continueGrid.innerHTML = '<p style="color: var(--grey);">No continue watching items yet.</p>';
   return;
  }
+
  continueItems.forEach((item, index) => {
   const card = document.createElement('div');
   card.className = 'anime-card';
-  const posterImage = item.image ? `<img src="${item.image}" alt="${item.title || 'Continue watching'}">` : '<div style="height:260px;background:#111;"></div>';
+  
+  card.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+  `;
+
   const lastEpisode = item.episode || 1;
-  const episodeLabel = item.episodeName ? item.episodeName : `Episode ${lastEpisode}`;
   const title = item.title || 'Untitled Anime';
+  const imageUrl = item.image || '';
 
   card.innerHTML = `
-            <div style="position: relative; height: 260px;">
-                ${posterImage}
-                <button class="remove-continue-btn" data-index="${index}" type="button" title="Remove from continue watching">🗑</button>
-                <span class="continue-pill">Last watched • Ep ${lastEpisode}</span>
-            </div>
-            <div class="info">
-                <h3>${title}</h3>
-                <span>${episodeLabel}</span>
-            </div>
-        `;
-  card.onclick = () => window.location.href = `${window.resolveSitePath('/pages/watch.html')}?animeId=${item.animeId}&ep=${lastEpisode}`;
+      <div style="width: 100%; aspect-ratio: 2/3; overflow: hidden; background: #000; position: relative;">
+          <img src="${imageUrl}" alt="${title}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <button class="remove-continue-btn" data-index="${index}" type="button" title="Remove from continue watching">🗑</button>
+      </div>
+      <div style="padding: 12px; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; gap: 8px;">
+          <h4 style="font-size: 0.9rem; font-weight: 600; line-height: 1.3; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.6em; color: #fff;" title="${title}">
+              ${title}
+          </h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #8b949e; margin-top: auto; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+              <span style="background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; color: #fff;">Ep ${lastEpisode}</span>
+              <span>Last watched</span>
+          </div>
+      </div>
+  `;
+
+  card.addEventListener('mouseenter', () => {
+      card.style.transform = 'translateY(-4px)';
+      card.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+  });
+  
+  card.addEventListener('mouseleave', () => {
+      card.style.transform = 'translateY(0)';
+      card.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+  });
+
+  card.onclick = (e) => {
+      if (e.target.classList.contains('remove-continue-btn')) return;
+      window.location.href = `${window.resolveSitePath('/pages/watch.html')}?animeId=${item.animeId}&ep=${lastEpisode}`;
+  };
 
   const removeButton = card.querySelector('.remove-continue-btn');
   if (removeButton) {
