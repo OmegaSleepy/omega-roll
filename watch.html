@@ -5,16 +5,34 @@
     <title>Watching - Omega-Roll</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .video-player-container { background: #000; width: 100%; aspect-ratio: 16/9; max-height: 550px; margin: 20px 0; border: 2px solid var(--neon-green); border-radius: 8px; overflow: hidden; }
+        .video-player-container { background: #000; width: 100%; aspect-ratio: 16/9; max-height: 550px; margin: 20px 0; border: 2px solid rgba(57,255,20,0.35); border-radius: 18px; overflow: hidden; box-shadow: 0 18px 42px rgba(0,0,0,0.45); }
         .video-player-container iframe { width: 100%; height: 100%; border: none; }
-        .control-bar { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; background: #111; padding: 15px; border-radius: 6px; border: 1px solid #222; }
-        .control-group { display: flex; align-items: center; gap: 10px; }
-        select, .switch-btn { background: #000; color: #fff; border: 1px solid var(--neon-green); padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
-        select:focus, .switch-btn:focus { outline: none; border-color: #7cff99; box-shadow: 0 0 10px rgba(57,255,20,0.16); }
-        .switch-btn.active { background: var(--neon-green); color: #000; }
-        .switch-btn:hover { background: rgba(57,255,20,0.12); }
-        .pin-btn { background: #1f2833; border: 1px dashed var(--neon-green); color: var(--neon-green); padding: 8px 15px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .control-bar { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; background: linear-gradient(180deg, rgba(17,17,17,0.96), rgba(12,16,20,0.96)); padding: 18px; border-radius: 18px; border: 1px solid rgba(57,255,20,0.12); box-shadow: 0 18px 30px rgba(0,0,0,0.2); }
+        .control-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .switch-btn, .ep-nav-btn, .pin-btn, .episode-select-trigger { background: rgba(10,14,19,0.95); color: #fff; border: 1px solid rgba(57,255,20,0.28); padding: 10px 15px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s ease; }
+        .switch-btn:focus, .ep-nav-btn:focus, .pin-btn:focus, .episode-picker-search:focus { outline: none; border-color: #7cff99; box-shadow: 0 0 10px rgba(57,255,20,0.16); }
+        .switch-btn.active { background: linear-gradient(135deg, var(--neon-green), #99ff8f); color: #000; border-color: transparent; }
+        .switch-btn:hover, .ep-nav-btn:hover, .pin-btn:hover, .episode-select-trigger:hover { background: rgba(57,255,20,0.08); }
+        .pin-btn { background: rgba(35,47,62,0.9); border-style: dashed; color: var(--neon-green); }
         .pin-btn:hover { background: var(--neon-green); color: #000; border-style: solid; }
+        .episode-picker-shell { display: flex; flex-direction: column; gap: 12px; min-width: min(100%, 420px); background: rgba(8, 12, 18, 0.8); border: 1px solid rgba(57,255,20,0.12); border-radius: 16px; padding: 14px; }
+        .episode-picker-toolbar { display: flex; align-items: center; gap: 10px; }
+        .ep-nav-btn { flex: 1; min-width: 82px; }
+        .ep-nav-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .episode-current-indicator { flex: 1.2; text-align: center; font-weight: 800; color: var(--neon-green); background: rgba(57,255,20,0.08); border: 1px solid rgba(57,255,20,0.2); border-radius: 12px; padding: 10px; }
+        .episode-picker-search { width: 100%; background: rgba(10,14,19,0.95); border: 1px solid rgba(148, 163, 184, 0.2); color: #fff; border-radius: 12px; padding: 10px 12px; font-size: 0.95rem; }
+        .episode-picker-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; max-height: 260px; overflow: auto; padding-right: 4px; }
+        .episode-chip { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; width: 100%; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 12px; color: var(--text-color); cursor: pointer; transition: 0.2s ease; }
+        .episode-chip:hover { border-color: rgba(57,255,20,0.35); background: rgba(57,255,20,0.08); }
+        .episode-chip.active { background: linear-gradient(135deg, rgba(57,255,20,0.18), rgba(57,255,20,0.08)); border-color: rgba(57,255,20,0.5); }
+        .episode-chip-number { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--neon-green); }
+        .episode-chip-title { font-size: 0.82rem; line-height: 1.35; color: var(--text-muted); }
+        .episode-empty { color: var(--grey); padding: 16px 4px; font-size: 0.9rem; }
+        .episode-picker-select { display: none; }
+        @media (max-width: 760px) {
+            .episode-picker-shell { min-width: 100%; }
+            .episode-picker-list { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+        }
     </style>
 </head>
 <body>
@@ -30,8 +48,16 @@
 
     <div class="control-bar">
         <div class="control-group">
-            <label for="ep-picker" style="font-weight: bold; color: var(--grey);">Jump to Ep:</label>
-            <select id="ep-picker"></select>
+            <div class="episode-picker-shell" aria-label="Episode picker">
+                <div class="episode-picker-toolbar">
+                    <button type="button" id="prev-episode-btn" class="ep-nav-btn" aria-label="Previous episode">← Prev</button>
+                    <div id="episode-current-indicator" class="episode-current-indicator">Ep 1</div>
+                    <button type="button" id="next-episode-btn" class="ep-nav-btn" aria-label="Next episode">Next →</button>
+                </div>
+                <input type="search" id="episode-search" class="episode-picker-search" placeholder="Search episode title..." aria-label="Search episode title" />
+                <div id="episode-picker-list" class="episode-picker-list"></div>
+                <select id="ep-picker" class="episode-picker-select" aria-label="Episode selector"></select>
+            </div>
         </div>
 
         <div class="control-group">

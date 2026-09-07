@@ -304,6 +304,8 @@ function createAnimeCard(anime) {
  const watchLaterList = JSON.parse(localStorage.getItem('watchLater')) || [];
  const isSaved = watchLaterList.some(item => item.id == anime.mal_id);
 
+ const formattedSeasonText = seasonText ? seasonText.replace(/\s*\|\s*/g, ' • ') : '';
+
  card.innerHTML = `
         <div style="position: relative; height: 260px;">
             <img src="${anime.images.jpg.large_image_url}" alt="${cleanTitle}" onclick="window.location.href='anime.html?id=${anime.mal_id}'">
@@ -313,7 +315,11 @@ function createAnimeCard(anime) {
         </div>
         <div class="info" onclick="window.location.href='anime.html?id=${anime.mal_id}'">
             <h3>${cleanTitle}</h3>
-            <span>★ ${anime.score || 'N/A'}${episodeLabel}${seasonBadge}</span>
+            <div class="anime-card-meta">
+                <span class="anime-card-score">★ ${anime.score || 'N/A'}</span>
+                <span class="anime-card-badge">${anime.episodes || '?'} eps</span>
+                ${formattedSeasonText ? `<span class="anime-card-badge anime-card-badge-alt">${formattedSeasonText}</span>` : ''}
+            </div>
         </div>
     `;
 

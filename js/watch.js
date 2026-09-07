@@ -12,6 +12,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
  const videoTitle = document.getElementById('video-title');
  const epPicker = document.getElementById('ep-picker');
+ const episodeSearch = document.getElementById('episode-search');
+ const episodePickerList = document.getElementById('episode-picker-list');
+ const currentEpisodeIndicator = document.getElementById('episode-current-indicator');
+ const prevEpisodeBtn = document.getElementById('prev-episode-btn');
+ const nextEpisodeBtn = document.getElementById('next-episode-btn');
  const btnSub = document.getElementById('btn-sub');
  const btnDub = document.getElementById('btn-dub');
  const pinBtn = document.getElementById('pin-episode-btn');
@@ -51,31 +56,83 @@ document.addEventListener("DOMContentLoaded", async () => {
      // ignore and fallback to numeric count
     }
 
-  epPicker.innerHTML = ''; // Clear placeholder data safely
-  if (episodeList.length > 0) {
-   episodeList.forEach(ep => {
-    const epNumber = ep.episode || ep.mal_id || null;
-    if (!epNumber) return;
-    const title = getEpisodeTitle(ep, lang) || `Episode ${epNumber}`;
-    const opt = document.createElement('option');
-    opt.value = epNumber;
-    opt.innerText = `Ep ${epNumber}: ${title}`;
-    if (epNumber === currentEp) opt.selected = true;
-    epPicker.appendChild(opt);
+  const parsedEpisodeOptions = episodeList.length > 0
+   ? episodeList.map(ep => {
+      const epNumber = ep.episode || ep.mal_id || null;
+      if (!epNumber) return null;
+      const title = getEpisodeTitle(ep, lang) || `Episode ${epNumber}`;
+      return { number: Number(epNumber), title };
+    }).filter(Boolean)
+   : Array.from({ length: totalEpisodes }, (_, idx) => ({ number: idx + 1, title: `Episode ${idx + 1}` }));
+
+  epPicker.innerHTML = '';
+  parsedEpisodeOptions.forEach(ep => {
+   const opt = document.createElement('option');
+   opt.value = ep.number;
+   opt.innerText = `Ep ${ep.number}: ${ep.title}`;
+   if (ep.number === currentEp) opt.selected = true;
+   epPicker.appendChild(opt);
+  });
+
+  const renderEpisodePicker = () => {
+   if (!episodePickerList || !episodeSearch || !currentEpisodeIndicator) return;
+
+   const query = (episodeSearch.value || '').trim().toLowerCase();
+   const visibleEpisodes = parsedEpisodeOptions.filter(ep => {
+    const matchesNumber = String(ep.number).includes(query);
+    const matchesTitle = ep.title.toLowerCase().includes(query);
+    return !query || matchesNumber || matchesTitle;
    });
-  } else {
-   for (let i = 1; i <= totalEpisodes; i++) {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.innerText = `Episode ${i}`;
-    if (i === currentEp) opt.selected = true;
-    epPicker.appendChild(opt);
+
+   if (visibleEpisodes.length === 0) {
+    episodePickerList.innerHTML = '<div class="episode-empty">No matching episodes.</div>';
+    return;
    }
+
+   episodePickerList.innerHTML = visibleEpisodes.map(ep => `
+    <button type="button" class="episode-chip ${ep.number === currentEp ? 'active' : ''}" data-ep="${ep.number}">
+      <span class="episode-chip-number">Ep ${ep.number}</span>
+      <span class="episode-chip-title">${ep.title}</span>
+    </button>
+   `).join('');
+
+   episodePickerList.querySelectorAll('.episode-chip').forEach(button => {
+    button.addEventListener('click', () => {
+     const chosenEp = Number(button.dataset.ep);
+     if (!isNaN(chosenEp)) {
+      window.location.href = `watch.html?animeId=${animeId}&ep=${chosenEp}`;
+     }
+    });
+   });
+
+   currentEpisodeIndicator.innerText = `Ep ${currentEp}`;
+   prevEpisodeBtn.disabled = currentEp <= 1;
+   nextEpisodeBtn.disabled = currentEp >= Math.max(...parsedEpisodeOptions.map(ep => ep.number), 1);
+  };
+
+  if (episodeSearch) {
+   episodeSearch.oninput = renderEpisodePicker;
   }
 
-  const currentEpisode = episodeList.find(ep => ep.episode === currentEp) || null;
-  const episodeLabel = currentEpisode ? getEpisodeTitle(currentEpisode, lang) : '';
+  prevEpisodeBtn.onclick = () => {
+   if (currentEp > 1) {
+    const previousEp = Math.max(...parsedEpisodeOptions.map(ep => ep.number).filter(n => n < currentEp), 1);
+    window.location.href = `watch.html?animeId=${animeId}&ep=${previousEp}`;
+   }
+  };
+
+  nextEpisodeBtn.onclick = () => {
+   const maxEp = Math.max(...parsedEpisodeOptions.map(ep => ep.number), currentEp);
+   if (currentEp < maxEp) {
+    const nextEp = Math.min(...parsedEpisodeOptions.map(ep => ep.number).filter(n => n > currentEp), maxEp);
+    window.location.href = `watch.html?animeId=${animeId}&ep=${nextEp}`;
+   }
+  };
+
+  const currentEpisode = parsedEpisodeOptions.find(ep => ep.number === currentEp) || null;
+  const episodeLabel = currentEpisode ? currentEpisode.title : '';
   videoTitle.innerText = episodeLabel ? `${cleanTitle} — ${episodeLabel}` : `${cleanTitle} (Episode ${currentEp})`;
+  renderEpisodePicker();
   saveContinueWatching({
    animeId,
    title: cleanTitle,
