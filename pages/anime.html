@@ -24,8 +24,8 @@
     <style>
         .page-layout {
             display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 24px;
+            grid-template-columns: 1fr 320px;
+            gap: 28px;
             align-items: start;
         }
 
@@ -36,35 +36,117 @@
             align-items: flex-start;
         }
 
+        .poster-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+            width: 260px;
+        }
+
         .poster-container {
             position: relative;
-            flex-shrink: 0;
-            width: 220px;
+            width: 100%;
         }
 
         .details-poster {
             width: 100%;
             height: auto;
-            border-radius: 12px;
+            border-radius: 10px;
             object-fit: cover;
             display: block;
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
+        .poster-type-tag {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            border: 1px solid rgba(57, 255, 20, 0.5);
+            color: var(--neon-green, #39ff14);
+            font-size: 0.72rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            backdrop-filter: blur(4px);
+            z-index: 5;
+        }
+
+        .meta-badges-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .meta-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .meta-badge svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: var(--neon-green);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        .meta-badge-span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .details-info {
             flex-grow: 1;
+            min-width: 0;
         }
 
         .poster-actions {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 8px;
+            left: 8px;
             display: flex;
             gap: 6px;
             z-index: 5;
         }
 
-        /* Right Side Episode Picker Sidebar */
+        .broadcast-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(57, 255, 20, 0.05);
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 14px;
+            font-size: 0.82rem;
+        }
+
+        .broadcast-card svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--neon-green);
+            stroke-width: 2;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        /* Sidebar Episode List */
         .episode-sidebar {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -130,9 +212,9 @@
                 flex-direction: column;
                 align-items: center;
             }
-            .poster-container {
+            .poster-column {
                 width: 100%;
-                max-width: 240px;
+                max-width: 260px;
             }
         }
     </style>
@@ -142,10 +224,9 @@
 
 <main class="container">
     <div class="page-layout">
-        <!-- Left Side: Details & Recommendations -->
+        <!-- Main Content (Anime Details) -->
         <div class="main-content">
             <div class="details-wrapper" id="anime-details"></div>
-            <div id="recommendations-section"></div>
         </div>
 
         <!-- Right Side: Searchable Episode Picker -->
