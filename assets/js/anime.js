@@ -24,8 +24,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     const cleanedSynopsis = (anime.synopsis || 'No synopsis available.').replace(/\s*\[Written by MAL Rewrite\]\s*$/i, '');
 
+    // Try to determine external IDs for MAL and AniList
+    let malId = anime.mal_id || anime.malId || null;
+    let anilistId = anime.anilist_id || anime.anilistId || null;
+    if (Array.isArray(anime.external_links)) {
+      anime.external_links.forEach(link => {
+        if (!malId && link && link.url && /myanimelist\.net/i.test(link.url)) {
+          const m = link.url.match(/myanimelist\.net\/anime\/(\d+)/i);
+          if (m) malId = m[1];
+        }
+        if (!anilistId && link && link.url && /anilist\.co/i.test(link.url)) {
+          const m = link.url.match(/anilist\.co\/anime\/(\d+)/i);
+          if (m) anilistId = m[1];
+        }
+      });
+    }
+
+    const posterImageSrc = anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url || '';
+
+    const posterHtml = `
+        <div class="poster-container">
+            ${posterImageSrc ? `<img class="details-poster" src="${posterImageSrc}" alt="${cleanTitle}">` : ''}
+            <div class="poster-actions">
+                ${malId ? `<a class="poster-action" href="https://myanimelist.net/anime/${malId}" target="_blank" rel="noopener noreferrer">MAL</a>` : ''}
+                ${anilistId ? `<a class="poster-action" href="https://anilist.co/anime/${anilistId}" target="_blank" rel="noopener noreferrer">AL</a>` : ''}
+            </div>
+        </div>
+    `;
+
     detailsContainer.innerHTML = `
-        <img class="details-poster" src="${anime.images.jpg.large_image_url}" alt="${anime.title}">
+        ${posterHtml}
         <div class="details-info">
             <h1 style="font-size: 1.8rem; margin-bottom: 8px;">${cleanTitle}</h1>
             <p style="margin-bottom: 12px; opacity: 0.8; font-size: 0.9rem;">${anime.title_japanese || ''}</p>
