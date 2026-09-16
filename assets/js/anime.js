@@ -96,12 +96,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             <p style="margin-bottom: 14px; opacity: 0.7; font-size: 0.88rem;">${anime.title_japanese || ''}</p>
             <p style="margin-bottom: 14px; line-height: 1.6; font-size: 0.94rem;">${cleanedSynopsis}</p>
             
-            ${localBroadcastStr ? `
-                <div class="broadcast-card">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    <div><strong>Airs:</strong> ${localBroadcastStr}</div>
-                </div>
-            ` : ''}
+            ${(localBroadcastStr && status === 'Currently Airing') ? `
+            <div class="broadcast-card">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div><strong>Airs:</strong> ${localBroadcastStr}</div>
+            </div>
+        ` : ''}
         </div>
     `;
 
