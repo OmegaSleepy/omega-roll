@@ -85,54 +85,48 @@ a {
     top: 20px;
 }
 
+/* --- HEADER & NAVIGATION STYLES --- */
 header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 18px;
-    padding: 16px clamp(18px, 3vw, 52px);
-    background: rgba(7, 10, 14, 0.8);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(57, 255, 20, 0.18);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    background: rgba(13, 18, 24, 0.95);
+    border: 1px solid rgba(57, 255, 20, 0.2);
+    border-radius: 12px;
+    padding: 10px 20px;
+    margin: 12px auto;
+    max-width: 1200px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .logo {
-    color: var(--neon-green);
-    font-size: clamp(1.15rem, 2vw, 1.7rem);
+    font-size: 1.3rem;
     font-weight: 800;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    color: var(--neon-green, #39ff14);
     text-decoration: none;
-    text-shadow: 0 0 18px rgba(57,255,20,0.4);
+    letter-spacing: 0.05em;
 }
 
 nav {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
     gap: 8px;
 }
 
 nav a {
-    color: var(--text-color);
+    color: var(--text-color, #edf4ff);
     text-decoration: none;
-    font-size: 0.94rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    padding: 10px 14px;
-    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
     border: 1px solid transparent;
-    transition: 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 nav a:hover,
 nav a.active {
-    color: var(--neon-green);
+    color: var(--neon-green, #39ff14);
     background: rgba(57, 255, 20, 0.08);
     border-color: rgba(57, 255, 20, 0.25);
     box-shadow: inset 0 0 0 1px rgba(57, 255, 20, 0.12);
@@ -141,31 +135,67 @@ nav a.active {
 .header-actions {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    gap: 12px;
 }
 
 .header-action-btn {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(57, 255, 20, 0.4);
-    color: var(--text-color);
-    padding: 11px 18px;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color, #edf4ff);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: 700;
-    transition: 0.2s ease;
-    min-width: 120px;
+    transition: all 0.2s ease;
 }
 
 .header-action-btn:hover {
-    background: linear-gradient(135deg, rgba(57,255,20,0.18), rgba(57,255,20,0.08));
-    color: var(--neon-green);
-    box-shadow: var(--shadow-glow);
+    background: rgba(57, 255, 20, 0.15);
+    color: var(--neon-green, #39ff14);
+    border-color: var(--neon-green, #39ff14);
+    box-shadow: 0 0 12px rgba(57, 255, 20, 0.2);
+}
+
+.language-toggle {
+    display: flex;
+    align-items: center;
+    background: rgba(10, 14, 19, 0.95);
+    border: 1px solid rgba(57, 255, 20, 0.22);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.language-btn {
+    background: transparent;
+    color: var(--text-color, #edf4ff);
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.language-btn.active {
+    background: var(--neon-green, #39ff14);
+    color: #000;
+}
+
+/* Schedule header clear button - small variant of header action */
+.schedule-panel-header .header-action-btn,
+#schedule-panel .header-action-btn {
+    min-width: auto;
+    padding: 8px 10px;
+    font-size: 0.85rem;
 }
 
 .shortcut-help {
-    position: absolute;
-    top: calc(100% + 12px);
-    right: clamp(18px, 3vw, 52px);
+    position: fixed; /* Fixes position relative to the viewport/screen */
+    top: 70px;
+    right: max(20px, calc((100vw - 1200px) / 2));
+    z-index: 1000;
     min-width: min(300px, calc(100vw - 40px));
     background: rgba(8, 12, 18, 0.98);
     color: var(--text-color);
