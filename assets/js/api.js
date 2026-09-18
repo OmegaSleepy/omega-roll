@@ -92,29 +92,37 @@ function updateLanguageToggleUI() {
 
 function createSchedulePanel() {
     if (document.getElementById('schedule-panel')) return;
+
     const panel = document.createElement('div');
     panel.id = 'schedule-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-label', 'Weekly Schedule');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('tabindex', '-1');
+
     panel.innerHTML = `
      <div class="schedule-panel-header">
         <h2>Weekly Schedule</h2>
         <div style="display:flex; gap:8px; align-items:center;">
-            <button id="schedule-clear-all" class="header-action-btn" aria-label="Clear schedule">Clear All</button>
-            <button id="schedule-close" aria-label="Close">×</button>
+            <button id="schedule-clear-all" class="header-action-btn" aria-label="Clear all followed shows">Clear All</button>
+            <button id="schedule-close" aria-label="Close schedule panel">×</button>
         </div>
      </div>
      <div id="schedule-content"><p class="schedule-loading">Loading schedule…</p></div>
     `;
     document.body.appendChild(panel);
 
- const overlay = document.createElement('div');
- overlay.id = 'schedule-overlay';
- overlay.addEventListener('click', () => toggleSchedulePanel(false));
- document.body.appendChild(overlay);
+    const overlay = document.createElement('div');
+    overlay.id = 'schedule-overlay';
+    overlay.className = 'schedule-overlay';
+    overlay.addEventListener('click', () => toggleSchedulePanel(false));
+    document.body.appendChild(overlay);
 
- const toggleButton = document.getElementById('schedule-toggle');
- if (toggleButton) {
-  toggleButton.addEventListener('click', () => toggleSchedulePanel(true));
- }
+    const toggleButton = document.getElementById('schedule-toggle');
+    if (toggleButton) {
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.addEventListener('click', () => toggleSchedulePanel(true));
+    }
 
     const closeButton = document.getElementById('schedule-close');
     if (closeButton) {
@@ -131,6 +139,45 @@ function createSchedulePanel() {
             if (container) container.innerHTML = '<p class="schedule-loading">Loading schedule…</p>';
             await showSchedulePanel();
         });
+    }
+
+    // Global Keydown Handler: Close schedule when pressing Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            const openPanel = document.getElementById('schedule-panel');
+            if (openPanel && openPanel.classList.contains('open')) {
+                toggleSchedulePanel(false);
+            }
+        }
+    });
+}
+
+function toggleSchedulePanel(show) {
+    const panel = document.getElementById('schedule-panel');
+    const overlay = document.getElementById('schedule-overlay');
+    const toggleButton = document.getElementById('schedule-toggle');
+    const closeButton = document.getElementById('schedule-close');
+
+    if (!panel || !overlay) return;
+
+    panel.classList.toggle('open', show);
+    overlay.classList.toggle('open', show);
+
+    if (toggleButton) {
+        toggleButton.setAttribute('aria-expanded', String(show));
+    }
+
+    if (show) {
+        showSchedulePanel();
+        // Focus inside panel when opened for keyboard access
+        if (closeButton) {
+            setTimeout(() => closeButton.focus(), 50);
+        }
+    } else {
+        // Return focus to toggle button when closed
+        if (toggleButton) {
+            toggleButton.focus();
+        }
     }
 }
 
@@ -226,7 +273,7 @@ async function loadScheduleData() {
 
                 for (let offset = 1; offset <= remaining; offset++) {
                     const ep = releasedCount + offset;
-                    const epDate = new Date(baseDate.getTime() + (offset * 7 * 24 * 60 * 60 * 1000));
+                    const epDate = new Date(baseDate.getTime() + (offset - 1) * 7 * 24 * 60 * 60 * 1000);
                     let airInstant = null;
                     if (broadcastTime && timezone) {
                         const y = epDate.getUTCFullYear();
