@@ -94,6 +94,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
     `;
 
+
+    const isAiring = anime.airing || anime.status === "Currently Airing";
+
     detailsContainer.innerHTML = `
         ${posterColumnHtml}
         <div class="details-info">
@@ -101,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <p style="margin-bottom: 14px; opacity: 0.7; font-size: 0.88rem;">${anime.title_japanese || ''}</p>
             <p style="margin-bottom: 14px; line-height: 1.6; font-size: 0.94rem;">${cleanedSynopsis}</p>
             
-            ${(localBroadcastStr) ? `
+            ${isAiring && localBroadcastStr ? `
             <div class="broadcast-wrapper" id="broadcast-wrapper">
                 <div class="broadcast-card">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -112,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
     `;
 
-    if (isCurrentlyAiring(status)) {
+    if (isAiring) {
         try {
         const broadcastWrapper = detailsContainer.querySelector('.broadcast-wrapper');
         const targetContainer = broadcastWrapper || detailsContainer.querySelector('.details-info');
