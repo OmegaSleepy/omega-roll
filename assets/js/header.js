@@ -20,7 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <a href="${window.resolveSitePath('/pages/about.html')}" ${currentPage === 'about' ? 'class="active"' : ''}>About</a>
             </nav>
             <div class="header-actions">
+                <button type="button" class="header-action-btn" id="schedule-toggle" aria-expanded="false" aria-controls="schedule-panel">Schedule</button>
                 <button type="button" class="header-action-btn" id="shortcut-help-btn" aria-expanded="false" aria-controls="shortcut-help">Shortcuts</button>
+                <div class="language-toggle" aria-label="Language selector">
+                    <button type="button" class="language-btn active" id="lang-en" data-lang="EN" aria-pressed="true">EN</button>
+                    <button type="button" class="language-btn" id="lang-jp" data-lang="JP" aria-pressed="false">JP</button>
+                </div>
             </div>
             <div id="shortcut-help" class="shortcut-help" role="dialog" aria-label="Keyboard shortcuts"></div>
         `;

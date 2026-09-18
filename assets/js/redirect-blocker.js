@@ -166,35 +166,39 @@ XMLHttpRequest.prototype.open = function(method, url) {
 };
 
 /**
- * Prevent location redirects
+ * Wrap `location.assign` and `location.replace` to block unsafe navigations.
+ * Note: browsers do not allow redefining the `window.location` property itself
+ * (it's non-configurable), so we avoid attempting that to prevent runtime errors.
  */
-Object.defineProperty(window, 'location', {
-  get: function() {
-    return window._safeLocation || {
-      href: window.location.href,
-      origin: window.location.origin,
-      protocol: window.location.protocol,
-      hostname: window.location.hostname,
-      pathname: window.location.pathname,
-      search: window.location.search,
-      hash: window.location.hash,
-      reload: window.location.reload.bind(window.location),
-      replace: (url) => {
-        if (!isSafeRedirect(url)) {
-          console.warn('🚫 Blocked location.replace to:', url);
-          return;
-        }
-        window.location.replace(url);
+try {
+  if (typeof window.location.replace === 'function') {
+    const origReplace = window.location.replace.bind(window.location);
+    window.location.replace = function(url) {
+      if (!isSafeRedirect(url)) {
+        console.warn('🚫 Blocked location.replace to:', url);
+        return;
       }
+      return origReplace(url);
     };
-  },
-  set: function(url) {
-    if (!isSafeRedirect(url)) {
-      console.warn('🚫 Blocked location redirect to:', url);
-      return;
-    }
-    window.location.href = url;
   }
-});
+  if (typeof window.location.assign === 'function') {
+    const origAssign = window.location.assign.bind(window.location);
+    window.location.assign = function(url) {
+      if (!isSafeRedirect(url)) {
+        console.warn('🚫 Blocked location.assign to:', url);
+        return;
+      }
+      return origAssign(url);
+    };
+  }
+} catch (e) {
+  console.warn('Redirect blocker: could not wrap location methods safely:', e);
+}
+
+// Note: direct assignment like `window.location = url` or `window.location.href = url`
+// cannot be intercepted in all browsers since `window.location` is non-configurable.
+// The script blocks most common redirect vectors (links, forms, window.open, fetch, XHR,
+// and the assign/replace methods). If a page uses direct assignment, it will not be
+// prevented by this script.
 
 console.log('🛡️ Redirect blocker initialized - Allowed: myanimelist.net, Tenrai API');

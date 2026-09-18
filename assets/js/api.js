@@ -14,24 +14,36 @@ function injectConsistentHeader() {
  const existingHeader = document.querySelector('header');
  if (!existingHeader) return;
 
+ const hasEnhancedHeader = !!(
+   document.getElementById('schedule-toggle') ||
+   document.getElementById('shortcut-help-btn') ||
+   document.getElementById('lang-en')
+ );
+
+ if (hasEnhancedHeader) return;
+
  const currentPath = window.location.pathname.split("/").pop() || "index.html";
 
  existingHeader.innerHTML = `
+        <a href="#main-content" class="skip-link">Skip to content</a>
         <a href="${window.resolveSitePath('/index.html')}" class="logo">Omega-Roll</a>
-        <nav style="display: flex; align-items: center; gap: 20px;">
+        <nav aria-label="Primary">
             <a href="${window.resolveSitePath('/index.html')}" class="${currentPath === 'index.html' ? 'active' : ''}">Home</a>
             <a href="${window.resolveSitePath('/pages/explore.html')}" class="${currentPath === 'explore.html' ? 'active' : ''}">Browse</a>
             <a href="${window.resolveSitePath('/pages/genres.html')}" class="${currentPath === 'genres.html' ? 'active' : ''}">Genres</a>
             <a href="${window.resolveSitePath('/pages/search.html')}" class="${currentPath === 'search.html' ? 'active' : ''}">Search</a>
             <a href="${window.resolveSitePath('/pages/watch-later.html')}" class="${currentPath === 'watch-later.html' ? 'active' : ''}">Watch Later</a>
+            <a href="${window.resolveSitePath('/pages/about.html')}" class="${currentPath === 'about.html' ? 'active' : ''}">About</a>
         </nav>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <button id="schedule-toggle" class="header-action-btn">Schedule</button>
-            <div style="display: flex; background: #111; border: 1px solid var(--neon-green); border-radius: 20px; overflow: hidden; margin-left: 10px;">
-                <button id="lang-en" style="background: none; color: #fff; border: none; padding: 5px 12px; font-size: 11px; font-weight: bold; cursor: pointer;">EN</button>
-                <button id="lang-jp" style="background: none; color: #fff; border: none; padding: 5px 12px; font-size: 11px; font-weight: bold; cursor: pointer;">JP</button>
+        <div class="header-actions">
+            <button id="schedule-toggle" class="header-action-btn" type="button">Schedule</button>
+            <button type="button" class="header-action-btn" id="shortcut-help-btn" aria-expanded="false" aria-controls="shortcut-help">Shortcuts</button>
+            <div class="language-toggle" aria-label="Language selector">
+                <button id="lang-en" class="language-btn active" type="button" data-lang="EN" aria-pressed="true">EN</button>
+                <button id="lang-jp" class="language-btn" type="button" data-lang="JP" aria-pressed="false">JP</button>
             </div>
         </div>
+        <div id="shortcut-help" class="shortcut-help" role="dialog" aria-label="Keyboard shortcuts"></div>
     `;
 }
 
@@ -69,54 +81,230 @@ function updateLanguageToggleUI() {
  // Skip if buttons don't exist (e.g., on about page)
  if (!enBtn || !jpBtn) return;
 
- if (currentLang === 'EN') {
-  enBtn.style.background = 'var(--neon-green)';
-  enBtn.style.color = '#000';
-  jpBtn.style.background = 'none';
-  jpBtn.style.color = '#fff';
- } else {
-  jpBtn.style.background = 'var(--neon-green)';
-  jpBtn.style.color = '#000';
-  enBtn.style.background = 'none';
-  enBtn.style.color = '#fff';
- }
+ const isEnglish = currentLang === 'EN';
+
+ enBtn.classList.toggle('active', isEnglish);
+ jpBtn.classList.toggle('active', !isEnglish);
+ enBtn.setAttribute('aria-pressed', String(isEnglish));
+ jpBtn.setAttribute('aria-pressed', String(!isEnglish));
 }
 
+
 function createSchedulePanel() {
- if (document.getElementById('schedule-panel')) return;
- const panel = document.createElement('div');
- panel.id = 'schedule-panel';
- panel.innerHTML = `
-  <div class="schedule-panel-header">
-   <h2>Weekly Schedule</h2>
-   <button id="schedule-close" aria-label="Close">×</button>
-  </div>
-  <div id="schedule-content"><p class="schedule-loading">Loading schedule…</p></div>
- `;
- document.body.appendChild(panel);
+    if (document.getElementById('schedule-panel')) return;
 
- const overlay = document.createElement('div');
- overlay.id = 'schedule-overlay';
- overlay.addEventListener('click', () => toggleSchedulePanel(false));
- document.body.appendChild(overlay);
+    const panel = document.createElement('div');
+    panel.id = 'schedule-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-label', 'Weekly Schedule');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('tabindex', '-1');
 
- const toggleButton = document.getElementById('schedule-toggle');
- if (toggleButton) {
-  toggleButton.addEventListener('click', () => toggleSchedulePanel(true));
- }
+    panel.innerHTML = `
+     <div class="schedule-panel-header">
+        <h2>Weekly Schedule</h2>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <button id="schedule-clear-all" class="header-action-btn" aria-label="Clear all followed shows">Clear All</button>
+            <button id="schedule-close" aria-label="Close schedule panel">×</button>
+        </div>
+     </div>
+     <div id="schedule-content"><p class="schedule-loading">Loading schedule…</p></div>
+    `;
+    document.body.appendChild(panel);
 
- const closeButton = document.getElementById('schedule-close');
- if (closeButton) {
-  closeButton.addEventListener('click', () => toggleSchedulePanel(false));
- }
+    const overlay = document.createElement('div');
+    overlay.id = 'schedule-overlay';
+    overlay.className = 'schedule-overlay';
+    overlay.addEventListener('click', () => toggleSchedulePanel(false));
+    document.body.appendChild(overlay);
+
+    const toggleButton = document.getElementById('schedule-toggle');
+    if (toggleButton) {
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.addEventListener('click', () => toggleSchedulePanel(true));
+    }
+
+    const closeButton = document.getElementById('schedule-close');
+    if (closeButton) {
+        closeButton.addEventListener('click', () => toggleSchedulePanel(false));
+    }
+
+    const clearAllBtn = document.getElementById('schedule-clear-all');
+    if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', async () => {
+            if (!confirm('Clear all followed shows? This cannot be undone.')) return;
+            localStorage.removeItem('followSchedule');
+            window._cachedScheduleData = null;
+            const container = document.getElementById('schedule-content');
+            if (container) container.innerHTML = '<p class="schedule-loading">Loading schedule…</p>';
+            await showSchedulePanel();
+        });
+    }
+
+    // Global Keydown Handler: Close schedule when pressing Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            const openPanel = document.getElementById('schedule-panel');
+            if (openPanel && openPanel.classList.contains('open')) {
+                toggleSchedulePanel(false);
+            }
+        }
+    });
+}
+
+function toggleSchedulePanel(show) {
+    const panel = document.getElementById('schedule-panel');
+    const overlay = document.getElementById('schedule-overlay');
+    const toggleButton = document.getElementById('schedule-toggle');
+    const closeButton = document.getElementById('schedule-close');
+
+    if (!panel || !overlay) return;
+
+    panel.classList.toggle('open', show);
+    overlay.classList.toggle('open', show);
+
+    if (toggleButton) {
+        toggleButton.setAttribute('aria-expanded', String(show));
+    }
+
+    if (show) {
+        showSchedulePanel();
+        // Focus inside panel when opened for keyboard access
+        if (closeButton) {
+            setTimeout(() => closeButton.focus(), 50);
+        }
+    } else {
+        // Return focus to toggle button when closed
+        if (toggleButton) {
+            toggleButton.focus();
+        }
+    }
+}
+
+function getFollowedList() {
+    return JSON.parse(localStorage.getItem('followSchedule')) || [];
+}
+
+function saveFollowedList(list) {
+    localStorage.setItem('followSchedule', JSON.stringify(list));
 }
 
 async function loadScheduleData() {
- if (window._cachedScheduleData) return window._cachedScheduleData;
- const response = await fetchFromLiveChart('/anime');
- const scheduleData = response && response.items ? response.items : [];
- window._cachedScheduleData = scheduleData;
- return scheduleData;
+    if (window._cachedScheduleData) return window._cachedScheduleData;
+    const followed = getFollowedList();
+    const upcoming = [];
+
+    for (const item of followed) {
+        const animeId = item.animeId || item.id || item;
+        try {
+            // Always fetch or fallback to live API data if saved fields are missing
+            let anime = null;
+            const apiResp = await fetchFromTenrai(`/anime/${animeId}`);
+            if (apiResp && apiResp.data) {
+                anime = apiResp.data;
+            }
+
+            // Extract values with priority on live API data, then local storage
+            const title = anime?.title_english || anime?.title || item.title || 'Unknown Title';
+            const image = anime?.images?.jpg?.large_image_url || anime?.images?.jpg?.image_url || item.image || '';
+            const airedFromStr = anime?.aired?.from || item.airedFrom || null;
+            const broadcastTime = anime?.broadcast?.time || item.broadcastTime || "22:00";
+            const timezone = anime?.broadcast?.timezone || item.broadcastTimezone || "Asia/Tokyo";
+            const announced = parseInt(anime?.episodes || item.announcedCount || 0, 10);
+
+            if (!airedFromStr) {
+                console.warn(`Skipping schedule calculation for ${title}: No starting air date available.`);
+                continue;
+            }
+
+            // Determine released episode count and the most recent actual air date from the API,
+            // then anchor future schedule cards from the latest release instead of the first series date.
+            let releasedCount = 0;
+            let latestReleasedDate = null;
+            try {
+                const firstResp = await fetchFromTenrai(`/anime/${animeId}/episodes?page=1`);
+                const firstData = (firstResp && Array.isArray(firstResp.data)) ? firstResp.data : [];
+                const firstCount = firstData.length;
+
+                if (firstResp && firstResp.pagination && firstResp.pagination.last_visible_page) {
+                    const lastPage = Number(firstResp.pagination.last_visible_page) || 1;
+                    const lastResp = lastPage > 1 ? await fetchFromTenrai(`/anime/${animeId}/episodes?page=${lastPage}`) : firstResp;
+                    const lastPageItems = (lastResp && Array.isArray(lastResp.data)) ? lastResp.data : [];
+                    const items = lastPageItems.length ? lastPageItems : firstData;
+
+                    const validItems = items
+                        .map(ep => ({
+                            ...ep,
+                            airedAt: ep?.aired ? new Date(ep.aired).getTime() : NaN,
+                            epNumber: Number(ep?.episode ?? ep?.mal_id ?? 0)
+                        }))
+                        .filter(ep => !Number.isNaN(ep.airedAt) && ep.airedAt <= Date.now());
+
+                    if (validItems.length) {
+                        const latest = validItems.reduce((max, current) => (current.airedAt > max.airedAt ? current : max), validItems[0]);
+                        latestReleasedDate = new Date(latest.airedAt);
+                        releasedCount = validItems.reduce((max, current) => Math.max(max, current.epNumber || 0), 0) || validItems.length;
+                    } else {
+                        releasedCount = firstCount;
+                    }
+                } else if (firstResp && Array.isArray(firstResp.data)) {
+                    const validItems = firstResp.data
+                        .map(ep => ({ ...ep, airedAt: ep?.aired ? new Date(ep.aired).getTime() : NaN }))
+                        .filter(ep => !Number.isNaN(ep.airedAt) && ep.airedAt <= Date.now());
+                    if (validItems.length) {
+                        latestReleasedDate = new Date(Math.max(...validItems.map(ep => ep.airedAt)));
+                        releasedCount = validItems.length;
+                    } else {
+                        releasedCount = firstResp.data.length;
+                    }
+                }
+            } catch (e) {
+                console.warn('Episode count fetch error:', e);
+            }
+
+            const announcedCount = announced || 0;
+            const remaining = Math.max(0, announcedCount - releasedCount);
+
+            if (remaining > 0) {
+                // Anchor from the most recent actual release instead of the start date so gaps are accounted for.
+                const baseDate = latestReleasedDate && !Number.isNaN(latestReleasedDate.getTime())
+                    ? latestReleasedDate
+                    : (airedFromStr ? new Date(airedFromStr) : new Date());
+
+                for (let offset = 1; offset <= remaining; offset++) {
+                    const ep = releasedCount + offset;
+                    const epDate = new Date(baseDate.getTime() + (offset - 1) * 7 * 24 * 60 * 60 * 1000);
+                    let airInstant = null;
+                    if (broadcastTime && timezone) {
+                        const y = epDate.getUTCFullYear();
+                        const m = String(epDate.getUTCMonth() + 1).padStart(2, '0');
+                        const d = String(epDate.getUTCDate()).padStart(2, '0');
+                        airInstant = computeInstantForLocal(`${y}-${m}-${d}`, broadcastTime, timezone);
+                    }
+                    const airIso = airInstant ? new Date(airInstant).toISOString() : epDate.toISOString();
+                    upcoming.push({
+                        animeId,
+                        title,
+                        image,
+                        epNumber: ep,
+                        airDate: airIso,
+                        releasedCount,
+                        announcedCount: announcedCount,
+                        mal_id: anime?.mal_id || null,
+                        broadcastTimezone: timezone,
+                        broadcastTime: broadcastTime
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to calculate schedule for anime:', animeId, e);
+        }
+    }
+
+    upcoming.sort((a, b) => new Date(a.airDate) - new Date(b.airDate));
+    // Do not filter out past dates here; return all generated upcoming schedule entries
+    window._cachedScheduleData = upcoming;
+    return upcoming;
 }
 
 function fetchFromLiveChart(endpoint) {
@@ -166,58 +354,128 @@ function groupScheduleByDay(scheduleList) {
 }
 
 function renderScheduleItem(entry) {
- const imageUrl = entry.poster_image_large || entry.poster_image || '';
- const premiereDate = entry.premiere_date ? new Date(entry.premiere_date) : null;
- const timeText = premiereDate ? ` • ${premiereDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : '';
- const malId = getMALIdFromUrl(entry.mal_url);
- const href = malId ? `${window.resolveSitePath('/pages/anime.html')}?id=${malId}` : (entry.mal_url || '#');
- const target = malId ? '' : ' target="_blank" rel="noopener noreferrer"';
- const title = entry.english_title || entry.romaji_title || entry.native_title || 'Unknown Title';
- const typeText = getAnimeTypeLabel(entry.anime_type_d || entry.anime_type);
- return `
-   <a class="schedule-entry" href="${href}"${target}>
-      <img src="${imageUrl}" alt="${title}">
-      <div>
-        <strong>${title}</strong>
-        <small>${typeText}${timeText}</small>
-      </div>
-   </a>
- `;
+    const date = new Date(entry.airDate);
+        const dayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(date);
+        const timeLabel = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).format(date);
+
+        const removeBtn = `<button class="schedule-unfollow" data-id="${entry.animeId}" aria-label="Unfollow" title="Remove">x</button>`;
+
+        return `
+                <div class="schedule-entry">
+                    ${removeBtn}
+                    <div class="schedule-entry-content">
+                        <div class="schedule-entry-main">
+                            <div class="schedule-entry-title">${entry.title}</div>
+                            <div class="schedule-entry-ep">Ep ${entry.epNumber}</div>
+                            <div class="schedule-entry-meta">${dayLabel} • ${timeLabel}</div>
+                        </div>
+                        <div class="schedule-entry-right">
+                            <img class="schedule-entry-thumb" src="${entry.image}" alt="${entry.title}">
+                            <a class="schedule-view-btn" href="${window.resolveSitePath('/pages/watch.html')}?animeId=${entry.animeId}&ep=${entry.epNumber}">View</a>
+                        </div>
+                    </div>
+                </div>
+        `;
+}
+
+// Compute the UTC epoch milliseconds for a local date/time in an IANA timezone.
+// Uses a binary search over a 48-hour window to find the instant whose
+// formatted local fields match the requested local date/time. This handles DST.
+function computeInstantForLocal(dateStr /* YYYY-MM-DD */, timeStr /* HH:MM */, timeZone) {
+    try {
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const [hour, minute] = timeStr.split(':').map(s => Number(s));
+        const target = { year, month, day, hour, minute };
+
+        // Search window: start at UTC midnight of the day, expand +- 24h
+        const utcMid = Date.UTC(year, month - 1, day, 0, 0, 0);
+        let low = utcMid - 24 * 3600 * 1000;
+        let high = utcMid + 24 * 3600 * 1000;
+
+        const fmt = (ms) => {
+            const parts = new Intl.DateTimeFormat('en-US', { timeZone, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).formatToParts(new Date(ms));
+            const out = {};
+            parts.forEach(p => { if (p.type !== 'literal') out[p.type] = p.value; });
+            return out;
+        };
+
+        for (let i = 0; i < 50 && low <= high; i++) {
+            const mid = Math.floor((low + high) / 2);
+            const p = fmt(mid);
+            const py = Number(p.year), pm = Number(p.month), pd = Number(p.day), ph = Number(p.hour), pmin = Number(p.minute);
+            if (py === target.year && pm === target.month && pd === target.day && ph === target.hour && pmin === target.minute) {
+                return mid;
+            }
+            // Compare lexicographically by date-time
+            if (py < target.year || (py === target.year && (pm < target.month || (pm === target.month && (pd < target.day || (pd === target.day && (ph < target.hour || (ph === target.hour && pmin < target.minute)))))))) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+    } catch (e) {
+        console.warn('computeInstantForLocal failed', e);
+    }
+    return null;
 }
 
 function renderSchedulePanel(scheduleData) {
- const container = document.getElementById('schedule-content');
- if (!container) return;
- if (!Array.isArray(scheduleData) || scheduleData.length === 0) {
-  container.innerHTML = '<p class="schedule-empty">No schedule data available.</p>';
-  return;
- }
+    const container = document.getElementById('schedule-content');
+    if (!container) return;
+    if (!Array.isArray(scheduleData) || scheduleData.length === 0) {
+        container.innerHTML = '<p class="schedule-empty">No followed shows yet. Use the "Follow Schedule" button on an anime page to add shows.</p>';
+        return;
+    }
 
- const grouped = groupScheduleByDay(scheduleData);
- const days = Object.keys(grouped).sort((a, b) => {
-  const order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  return order.indexOf(a) - order.indexOf(b);
- });
+    // Group upcoming episodes by calendar day
+    const grouped = {};
+    scheduleData.forEach(entry => {
+        const d = new Date(entry.airDate);
+        const key = d.toISOString().slice(0,10); // YYYY-MM-DD
+        if (!grouped[key]) grouped[key] = { date: d, items: [] };
+        grouped[key].items.push(entry);
+    });
 
- container.innerHTML = days.map(day => {
-  const entries = grouped[day];
-  return `
-    <section class="schedule-day-section">
-      <h3>${day}</h3>
-      <div class="schedule-day-grid">
-        ${entries.map(renderScheduleItem).join('')}
-      </div>
-    </section>
-  `;
- }).join('');
+    const keys = Object.keys(grouped).sort((a,b) => new Date(a) - new Date(b));
+    if (keys.length === 0) {
+        container.innerHTML = '<p class="schedule-empty">No upcoming episodes for followed shows.</p>';
+        return;
+    }
+
+    container.innerHTML = keys.map(key => {
+        const day = grouped[key];
+        const dayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(day.date);
+        return `
+            <section class="schedule-day-section">
+                <h3>${dayLabel}</h3>
+                <div class="schedule-day-grid">
+                    ${day.items.map(renderScheduleItem).join('')}
+                </div>
+            </section>
+        `;
+    }).join('');
+
+    // Attach unfollow handlers
+    container.querySelectorAll('.schedule-unfollow').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            let list = getFollowedList();
+            list = list.filter(i => String(i.animeId || i.id || i) !== String(id));
+            saveFollowedList(list);
+            window._cachedScheduleData = null;
+            const updated = await loadScheduleData();
+            renderSchedulePanel(updated);
+        });
+    });
 }
 
 async function showSchedulePanel() {
- const container = document.getElementById('schedule-content');
- if (!container) return;
- container.innerHTML = '<p class="schedule-loading">Loading schedule…</p>';
- const scheduleData = await loadScheduleData();
- renderSchedulePanel(scheduleData);
+    const container = document.getElementById('schedule-content');
+    if (!container) return;
+    container.innerHTML = '<p class="schedule-loading">Loading schedule…</p>';
+    const scheduleData = await loadScheduleData();
+    renderSchedulePanel(scheduleData);
 }
 
 function toggleSchedulePanel(show) {

@@ -146,7 +146,6 @@
             flex-shrink: 0;
         }
 
-        /* Sidebar Episode List */
         .episode-sidebar {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -217,6 +216,47 @@
                 max-width: 260px;
             }
         }
+
+        .broadcast-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .broadcast-card {
+            margin-top: 0;
+        }
+
+        .follow-schedule-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            margin-top: 0;
+            border-radius: 8px;
+            background: rgba(57, 255, 20, 0.05);
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            color: var(--neon-green);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .follow-schedule-btn:hover {
+            background: rgba(57, 255, 20, 0.2);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+
+        .follow-schedule-btn.saved {
+            background: var(--neon-green);
+            color: #000;
+            border-color: var(--neon-green);
+        }
     </style>
 </head>
 <body>
@@ -224,12 +264,10 @@
 
 <main class="container">
     <div class="page-layout">
-        <!-- Main Content (Anime Details) -->
         <div class="main-content">
             <div class="details-wrapper" id="anime-details"></div>
         </div>
 
-        <!-- Right Side: Searchable Episode Picker -->
         <aside class="episode-sidebar">
             <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Episodes</h3>
             <input type="text" id="episode-search" class="episode-search-box" placeholder="Search episode number or title...">
