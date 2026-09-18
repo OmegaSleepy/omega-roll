@@ -53,6 +53,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Broadcast & local time formatting
     const localBroadcastStr = formatLocalBroadcast(anime.broadcast);
 
+    function isCurrentlyAiring(statusText) {
+     if (!statusText) return false;
+     return /air|releasing|ongoing/i.test(String(statusText));
+    }
+
     const posterColumnHtml = `
         <div class="poster-column">
             <div class="poster-container">
@@ -96,16 +101,77 @@ document.addEventListener("DOMContentLoaded", async () => {
             <p style="margin-bottom: 14px; opacity: 0.7; font-size: 0.88rem;">${anime.title_japanese || ''}</p>
             <p style="margin-bottom: 14px; line-height: 1.6; font-size: 0.94rem;">${cleanedSynopsis}</p>
             
-            ${(localBroadcastStr && status === 'Currently Airing') ? `
-            <div class="broadcast-card">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <div><strong>Airs:</strong> ${localBroadcastStr}</div>
+            ${(localBroadcastStr) ? `
+            <div class="broadcast-wrapper" id="broadcast-wrapper">
+                <div class="broadcast-card">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <div><strong>Airs:</strong> ${localBroadcastStr}</div>
+                </div>
             </div>
-        ` : ''}
+            ` : ''}
         </div>
     `;
 
-    // Fetch and render episode list
+    if (isCurrentlyAiring(status)) {
+        try {
+        const broadcastWrapper = detailsContainer.querySelector('.broadcast-wrapper');
+        const targetContainer = broadcastWrapper || detailsContainer.querySelector('.details-info');
+        if (targetContainer) {
+        const followBtn = document.createElement('button');
+        followBtn.id = 'follow-schedule-btn';
+        followBtn.className = 'follow-schedule-btn';
+        followBtn.setAttribute('aria-live', 'polite');
+
+        const follows = JSON.parse(localStorage.getItem('followSchedule')) || [];
+        const exists = follows.some(f => String(f.animeId) === String(animeId));
+        if (exists) followBtn.classList.add('saved');
+        
+        followBtn.textContent = exists ? '★' : '☆';
+        followBtn.title = exists ? 'Following Schedule' : 'Follow Schedule';
+        followBtn.setAttribute('aria-label', exists ? 'Unfollow schedule' : 'Follow schedule');
+        followBtn.setAttribute('aria-pressed', exists ? 'true' : 'false');
+
+        followBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            let list = JSON.parse(localStorage.getItem('followSchedule')) || [];
+            const found = list.some(f => String(f.animeId) === String(animeId));
+            if (found) {
+            list = list.filter(f => String(f.animeId) !== String(animeId));
+            followBtn.classList.remove('saved');
+            followBtn.textContent = '☆';
+            followBtn.title = 'Follow Schedule';
+            followBtn.setAttribute('aria-label', 'Follow schedule');
+            followBtn.setAttribute('aria-pressed', 'false');
+            } else {
+            const airedFromDate = anime.aired?.from || (anime.aired?.prop ? `${anime.aired.prop.from.year}-${String(anime.aired.prop.from.month).padStart(2,'0')}-${String(anime.aired.prop.from.day).padStart(2,'0')}T00:00:00Z` : null);
+
+            list.push({
+                animeId: animeId,
+                title: cleanTitle,
+                image: posterImageSrc,
+                airedFrom: airedFromDate,
+                broadcastTime: anime.broadcast?.time || null,
+                broadcastTimezone: anime.broadcast?.timezone || null,
+                announcedCount: anime.episodes || null
+            });
+            followBtn.classList.add('saved');
+            followBtn.textContent = '★';
+            followBtn.title = 'Following Schedule';
+            followBtn.setAttribute('aria-label', 'Unfollow schedule');
+            followBtn.setAttribute('aria-pressed', 'true');
+            }
+            localStorage.setItem('followSchedule', JSON.stringify(list));
+            window._cachedScheduleData = null;
+            if (typeof showSchedulePanel === 'function') await showSchedulePanel();
+        });
+
+        targetContainer.appendChild(followBtn);
+        }
+        } catch (e) {
+        console.warn('Follow button setup failed', e);
+        }
+    }
+    
     let episodesPage = 1;
     let episodesResp = await fetchFromTenrai(`/anime/${animeId}/episodes?page=${episodesPage}`);
     let episodesData = (episodesResp && Array.isArray(episodesResp.data)) ? episodesResp.data : [];
@@ -147,11 +213,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const items = episodeListContainer.querySelectorAll('.episode-item');
       items.forEach(item => {
        const text = item.dataset.searchtext || '';
-       if (text.includes(query)) {
-        item.style.display = 'block';
-       } else {
-        item.style.display = 'none';
-       }
+       item.style.display = text.includes(query) ? 'block' : 'none';
       });
      });
     }
